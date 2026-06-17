@@ -1,5 +1,6 @@
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ThemeProvider from "@/providers/ThemeProvider";
 
 const fraunces = Fraunces({
   variable: "--font-heading",
@@ -26,8 +27,11 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${fraunces.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+      suppressHydrationWarning
     >
-      <body>{children}</body>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
