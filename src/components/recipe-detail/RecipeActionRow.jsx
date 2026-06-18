@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Bookmark, Flag, Lock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
@@ -186,11 +187,11 @@ const RecipeActionRow = ({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              {/* Quiet confirmation chip — secondary bg, no dominant visual weight */}
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md text-[11px] uppercase tracking-[0.06em] font-medium font-sans">
+              {/* Quiet confirmation chip — Badge secondary, no dominant visual weight */}
+              <Badge className="bg-secondary text-secondary-foreground border-transparent rounded-md text-[11px] uppercase tracking-[0.06em] font-medium font-sans h-auto px-3 py-1.5 gap-1.5">
                 <Check className="size-3 shrink-0" aria-hidden />
                 {isPremium ? "Purchased" : "Free Recipe"}
-              </span>
+              </Badge>
             </motion.div>
           ) : null}
         </AnimatePresence>

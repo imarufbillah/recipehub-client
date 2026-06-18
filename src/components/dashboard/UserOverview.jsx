@@ -1,5 +1,6 @@
 import { BookOpen, Heart, ThumbsUp, Crown } from "lucide-react";
 import StatCard from "./StatCard";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -61,10 +62,10 @@ const UserOverview = ({
       >
         {stats.isPremium ? (
           /* Premium — quiet accent badge confirmation */
-          <span className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-[11px] uppercase tracking-[0.08em] font-medium font-sans px-2.5 py-1 rounded-sm">
+          <Badge className="bg-accent/10 text-accent border-transparent rounded-sm text-[11px] uppercase tracking-[0.08em] font-medium font-sans h-auto px-2.5 py-1 gap-1.5">
             <Crown className="size-3 shrink-0" aria-hidden />
             Premium Member
-          </span>
+          </Badge>
         ) : (
           /* Not premium — ghost upgrade prompt */
           <Button

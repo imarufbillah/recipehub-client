@@ -1,4 +1,5 @@
 import { Clock, ChefHat, Utensils, BarChart2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 /**
  * Recipe title block — server component.
@@ -48,9 +49,9 @@ const RecipeTitleBlock = ({
       {/* ── Premium badge — accent token, only when isPremium ── */}
       {isPremium && (
         <div>
-          <span className="inline-flex items-center bg-accent text-accent-foreground text-[11px] uppercase tracking-[0.08em] font-medium font-sans px-3 py-1 rounded-sm">
+          <Badge className="bg-accent text-accent-foreground border-transparent rounded-sm text-[11px] uppercase tracking-[0.08em] font-medium font-sans h-auto px-3 py-1">
             Premium
-          </span>
+          </Badge>
         </div>
       )}
 

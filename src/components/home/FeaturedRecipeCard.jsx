@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, ChefHat } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
@@ -50,9 +51,9 @@ const FeaturedRecipeCard = ({
         {/* Featured badge — accent token, top-left, appears only when featured=true */}
         {featured && (
           <div className="absolute top-3 left-3 z-10">
-            <span className="inline-block bg-accent text-accent-foreground text-[11px] uppercase tracking-[0.08em] font-medium font-sans px-2.5 py-1 rounded-sm">
+            <Badge className="bg-accent text-accent-foreground border-transparent rounded-sm text-[11px] uppercase tracking-[0.08em] font-medium font-sans h-auto px-2.5 py-1">
               Featured
-            </span>
+            </Badge>
           </div>
         )}
       </div>

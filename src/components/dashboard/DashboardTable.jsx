@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,30 +29,33 @@ import { cn } from "@/lib/utils";
 
 // ─── Status badge ────────────────────────────────────────────────────────────
 
+// Maps status strings to shadcn Badge className overrides.
+// Badge base: rounded-4xl — override to rounded-sm to match design system pill style.
 const STATUS_STYLES = {
-  active: "bg-secondary text-secondary-foreground",
-  inactive: "bg-muted text-muted-foreground",
-  blocked: "bg-destructive/10 text-destructive",
-  featured: "bg-accent text-accent-foreground",
-  pending: "bg-muted text-muted-foreground",
-  resolved: "bg-secondary text-secondary-foreground",
-  open: "bg-destructive/10 text-destructive",
-  premium: "bg-accent/15 text-accent",
-  free: "bg-muted text-muted-foreground",
+  active:
+    "bg-secondary text-secondary-foreground border-transparent rounded-sm",
+  inactive: "bg-muted text-muted-foreground border-transparent rounded-sm",
+  blocked: "bg-destructive/10 text-destructive border-transparent rounded-sm",
+  featured: "bg-accent text-accent-foreground border-transparent rounded-sm",
+  pending: "bg-muted text-muted-foreground border-transparent rounded-sm",
+  resolved:
+    "bg-secondary text-secondary-foreground border-transparent rounded-sm",
+  open: "bg-destructive/10 text-destructive border-transparent rounded-sm",
+  premium: "bg-accent/15 text-accent border-transparent rounded-sm",
+  free: "bg-muted text-muted-foreground border-transparent rounded-sm",
 };
 
 export const StatusBadge = ({ status }) => {
-  const style = STATUS_STYLES[status?.toLowerCase()] ?? STATUS_STYLES.inactive;
+  const extra = STATUS_STYLES[status?.toLowerCase()] ?? STATUS_STYLES.inactive;
   return (
-    <span
+    <Badge
       className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded-sm",
-        "text-[10px] uppercase tracking-[0.08em] font-medium font-sans whitespace-nowrap",
-        style,
+        "text-[10px] uppercase tracking-[0.08em] font-medium font-sans h-auto px-2 py-0.5",
+        extra,
       )}
     >
       {status}
-    </span>
+    </Badge>
   );
 };
 
