@@ -7,7 +7,9 @@ import useScrolled from "@/hooks/useScrolled";
 import NavLinks from "./NavLinks";
 import ThemeToggle from "./ThemeToggle";
 import MobileMenu from "./MobileMenu";
+import UserMenu from "./UserMenu";
 import { Button } from "@/components/ui/button";
+import { useClientSession } from "@/hooks/useClientSession";
 
 /**
  * Sticky navbar — transparent over the hero, gains card background + hairline
@@ -20,6 +22,17 @@ import { Button } from "@/components/ui/button";
 const Navbar = () => {
   const scrolled = useScrolled(80);
   const pathname = usePathname();
+  const { user, isPending } = useClientSession();
+  //  user data structure for example
+  //   {
+  //     "name": "Inspector",
+  //     "email": "admin@recipehub.com",
+  //     "emailVerified": false,
+  //     "image": "https://img.icons8.com/fluent/1200/microsoft-admin.jpg",
+  //     "createdAt": "2026-06-18T09:06:46.440Z",
+  //     "updatedAt": "2026-06-18T09:06:46.440Z",
+  //     "id": "6a33b526c8e7e9cc557dcb62"
+  // }
 
   return (
     <header
@@ -45,28 +58,36 @@ const Navbar = () => {
         </div>
 
         {/* ── Desktop: theme toggle + auth ── */}
-        <div className="hidden md:flex items-center gap-2 shrink-0">
+        <div className="hidden md:flex items-center gap-3 shrink-0">
           <ThemeToggle />
 
-          {/* Login — ghost/text button, no fill, color shifts to primary on hover */}
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground hover:text-primary hover:bg-transparent px-3"
-          >
-            <Link href="/login">Login</Link>
-          </Button>
+          {isPending ? null : user ? (
+            /* Authenticated — user menu trigger + dropdown */
+            <UserMenu user={user} />
+          ) : (
+            /* Unauthenticated — Login + Register */
+            <>
+              {/* Login — ghost/text button, no fill, color shifts to primary on hover */}
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground hover:text-primary hover:bg-transparent px-3"
+              >
+                <Link href="/login">Login</Link>
+              </Button>
 
-          {/* Register — secondary button (NOT primary — primary is reserved for the page CTA) */}
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/register">Register</Link>
-          </Button>
+              {/* Register — secondary button (NOT primary — primary is reserved for the page CTA) */}
+              <Button variant="secondary" size="sm" asChild>
+                <Link href="/register">Register</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* ── Mobile: hamburger (overlay managed inside MobileMenu) ── */}
         <div className="flex md:hidden items-center">
-          <MobileMenu pathname={pathname} />
+          <MobileMenu pathname={pathname} user={user} isPending={isPending} />
         </div>
       </div>
     </header>
