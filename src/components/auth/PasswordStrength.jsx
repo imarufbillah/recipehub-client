@@ -25,8 +25,8 @@ import { cn } from "@/lib/utils";
 const REQUIREMENTS = [
   {
     id: "length",
-    label: "At least 8 characters",
-    test: (p) => p.length >= 8,
+    label: "At least 6 characters",
+    test: (p) => p.length >= 6,
   },
   {
     id: "upper",
