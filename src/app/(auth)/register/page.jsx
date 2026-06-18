@@ -76,30 +76,26 @@ const RegisterPage = () => {
       return; // bail out before touching the network
     }
 
-    // 2. Wrap async work in a transition so React can batch state updates
-    //    and keep the rest of the UI interactive while the request is in flight.
+    // 2. Non-blocking transition — keeps UI interactive during the request.
     startTransition(async () => {
-      try {
-        await signUp.email({
-          name,
-          email,
-          image: imageUrl,
-          password,
-        });
+      const { data, error } = await signUp.email({
+        name,
+        email,
+        image: imageUrl || undefined,
+        password,
+      });
 
-        // Simulate network latency during development
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        toast.success(
-          "Account created! Welcome to RecipeHub. Please login to continue.",
-        );
-        router.push("/login");
-      } catch (err) {
-        // Surface server-side errors (duplicate email, etc.) directly to the user.
+      if (error) {
         const message =
-          err?.message ?? "Something went wrong. Please try again.";
+          error.code === "USER_ALREADY_EXISTS"
+            ? "An account with this email already exists."
+            : (error.message ?? "Sign up failed. Please try again.");
         toast.error(message);
+        return;
       }
+
+      toast.success(`Welcome to RecipeHub, ${data?.user?.name ?? "Chef"}!`);
+      router.push("/login");
     });
   };
 
