@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Hero from "@/components/home/Hero";
+import FeaturedRecipes from "@/components/home/FeaturedRecipes";
 
 const Home = () => {
   return (
@@ -22,6 +23,9 @@ const Home = () => {
           className="object-cover object-center"
         />
       </div>
+
+      {/* Featured Recipes — image-dominant cards, staggered scroll reveal */}
+      <FeaturedRecipes />
     </>
   );
 };
