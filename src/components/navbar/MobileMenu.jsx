@@ -59,7 +59,7 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
 
   const initial = user?.name?.[0]?.toUpperCase() ?? "?";
   const isAdmin = user?.role === "admin";
-  const isPremium = user?.role === "premium" || user?.role === "admin";
+  const isPremium = user?.plan === "premium";
 
   // Lock body scroll while overlay is open
   useEffect(() => {

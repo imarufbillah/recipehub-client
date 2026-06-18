@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const UserMenuTrigger = ({ user, open, onClick }) => {
   const firstName = user?.name?.split(" ")[0] ?? "";
   const initial = user?.name?.[0]?.toUpperCase() ?? "?";
-  const isPremium = user?.role === "premium" || user?.role === "admin";
+  const isPremium = user?.plan === "premium";
 
   return (
     <button
