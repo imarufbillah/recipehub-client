@@ -1,10 +1,11 @@
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { Bodoni_Moda, Fraunces, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/providers/ThemeProvider";
 
-const fraunces = Fraunces({
+const displaySerif = Bodoni_Moda({
   variable: "--font-heading",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 const geistSans = Geist({
@@ -26,7 +27,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${displaySerif.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       suppressHydrationWarning
     >
       <body>
