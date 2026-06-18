@@ -1,23 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import FormField from "@/components/ui/FormField";
 import { cn } from "@/lib/utils";
+import { signIn } from "@/lib/auth-client";
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+// Runs synchronously before any network call — zero latency feedback.
+
+const validateForm = ({ email, password }) => {
+  if (!email.trim() || !email.includes("@"))
+    return "Please enter a valid email address.";
+  if (!password)
+    return "Please enter your password.";
+  return null;
+};
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("login", { email, password });
+
+    // 1. Client-side validation — bail before touching the network.
+    const validationError = validateForm({ email, password });
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
+    // 2. Non-blocking transition — keeps UI interactive during the request.
+    startTransition(async () => {
+      const { data, error } = await signIn.email({ email, password });
+
+      if (error) {
+        // Map common better-auth error codes to human-readable messages.
+        const message =
+          error.code === "INVALID_EMAIL_OR_PASSWORD"
+            ? "Incorrect email or password. Please try again."
+            : (error.message ?? "Sign in failed. Please try again.");
+        toast.error(message);
+        return;
+      }
+
+      toast.success(`Welcome back, ${data?.user?.name ?? "Chef"}!`);
+      router.push("/dashboard");
+    });
   };
 
   return (
@@ -36,11 +79,7 @@ const LoginPage = () => {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="flex flex-col gap-5"
-        >
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
           <FormField htmlFor="login-email" label="Email address">
             <Input
               id="login-email"
@@ -49,6 +88,7 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
+              disabled={isPending}
             />
           </FormField>
 
@@ -62,18 +102,19 @@ const LoginPage = () => {
                 placeholder="••••••••"
                 autoComplete="current-password"
                 className="pr-10"
+                disabled={isPending}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-150 focus-visible:outline-none"
+                tabIndex={-1}
               >
-                {showPassword ? (
-                  <EyeOff className="size-4" aria-hidden />
-                ) : (
-                  <Eye className="size-4" aria-hidden />
-                )}
+                {showPassword
+                  ? <EyeOff className="size-4" aria-hidden />
+                  : <Eye className="size-4" aria-hidden />
+                }
               </button>
             </div>
           </FormField>
@@ -91,12 +132,12 @@ const LoginPage = () => {
             type="submit"
             variant="default"
             className="w-full h-10 font-sans text-[14px] font-medium mt-1"
+            disabled={isPending}
           >
-            Sign in
+            {isPending ? "Signing in…" : "Sign in"}
           </Button>
         </form>
 
-        {/* shadcn Separator with "or" label — replaces hand-rolled h-px spans */}
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
           <span className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans select-none">
@@ -109,6 +150,7 @@ const LoginPage = () => {
           type="button"
           variant="outline"
           className="w-full h-10 font-sans text-[14px] font-medium gap-2.5"
+          disabled={isPending}
           onClick={() => console.log("google sign in")}
         >
           <FcGoogle className="size-4.5 shrink-0" aria-hidden />
