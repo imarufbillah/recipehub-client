@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, ImageIcon } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import PasswordStrength from "@/components/auth/PasswordStrength";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/auth-client";
+import GoogleAuth from "@/components/auth/GoogleAuth";
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 // Pure functions — run synchronously before any async work so the user gets
@@ -218,16 +218,7 @@ const RegisterPage = () => {
           <Separator className="flex-1" />
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full h-10 font-sans text-[14px] font-medium gap-2.5"
-          disabled={isPending}
-          onClick={() => console.log("google sign up")}
-        >
-          <FcGoogle className="size-4.5 shrink-0" aria-hidden />
-          Continue with Google
-        </Button>
+        <GoogleAuth isPending={isPending} />
 
         <p className="text-center text-[13px] font-sans text-muted-foreground">
           Already have an account?{" "}

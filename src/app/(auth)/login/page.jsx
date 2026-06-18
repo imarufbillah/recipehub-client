@@ -4,12 +4,12 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import FormField from "@/components/ui/FormField";
+import GoogleAuth from "@/components/auth/GoogleAuth";
 import { cn } from "@/lib/utils";
 import { signIn } from "@/lib/auth-client";
 
@@ -19,8 +19,7 @@ import { signIn } from "@/lib/auth-client";
 const validateForm = ({ email, password }) => {
   if (!email.trim() || !email.includes("@"))
     return "Please enter a valid email address.";
-  if (!password)
-    return "Please enter your password.";
+  if (!password) return "Please enter your password.";
   return null;
 };
 
@@ -31,7 +30,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isPending, startTransition] = useTransition();
-  
+
   const router = useRouter();
 
   const handleSubmit = (e) => {
@@ -79,7 +78,11 @@ const LoginPage = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-5"
+        >
           <FormField htmlFor="login-email" label="Email address">
             <Input
               id="login-email"
@@ -111,10 +114,11 @@ const LoginPage = () => {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-150 focus-visible:outline-none"
                 tabIndex={-1}
               >
-                {showPassword
-                  ? <EyeOff className="size-4" aria-hidden />
-                  : <Eye className="size-4" aria-hidden />
-                }
+                {showPassword ? (
+                  <EyeOff className="size-4" aria-hidden />
+                ) : (
+                  <Eye className="size-4" aria-hidden />
+                )}
               </button>
             </div>
           </FormField>
@@ -146,16 +150,7 @@ const LoginPage = () => {
           <Separator className="flex-1" />
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full h-10 font-sans text-[14px] font-medium gap-2.5"
-          disabled={isPending}
-          onClick={() => console.log("google sign in")}
-        >
-          <FcGoogle className="size-4.5 shrink-0" aria-hidden />
-          Continue with Google
-        </Button>
+        <GoogleAuth isPending={isPending} />
 
         <p className="text-center text-[13px] font-sans text-muted-foreground">
           New here?{" "}
