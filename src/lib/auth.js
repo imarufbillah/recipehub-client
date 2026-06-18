@@ -22,7 +22,18 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: String,
-        default: "user",
+        defaultValue: "user",
+        input: false,
+      },
+      plan: {
+        type: String,
+        defaultValue: "free",
+        enum: ["free", "premium"],
+        input: false,
+      },
+      recipes: {
+        type: Number,
+        defaultValue: 0,
         input: false,
       },
     },
