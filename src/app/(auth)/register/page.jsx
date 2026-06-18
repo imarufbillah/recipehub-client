@@ -1,30 +1,98 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ImageIcon } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import FormField from "@/components/ui/FormField";
 import PasswordStrength from "@/components/auth/PasswordStrength";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+// Pure functions — run synchronously before any async work so the user gets
+// instant feedback without waiting on a network round-trip.
+
+const URL_RE = /^https?:\/\/.+\..+/;
+
+const PASSWORD_RULES = [
+  {
+    test: (p) => p.length >= 6,
+    message: "Password must be at least 6 characters.",
+  },
+  {
+    test: (p) => /[A-Z]/.test(p),
+    message: "Password must contain at least one uppercase letter.",
+  },
+  {
+    test: (p) => /[a-z]/.test(p),
+    message: "Password must contain at least one lowercase letter.",
+  },
+];
+
+/**
+ * Returns the first failing rule's message, or null if all pass.
+ * Stops at the first failure so the user sees one clear error at a time.
+ */
+const validateForm = ({ name, email, imageUrl, password }) => {
+  if (!name.trim()) return "Please enter your display name.";
+  if (!email.trim() || !email.includes("@"))
+    return "Please enter a valid email address.";
+  if (imageUrl && !URL_RE.test(imageUrl))
+    return "Image URL must start with http:// or https://.";
+  for (const { test, message } of PASSWORD_RULES) {
+    if (!test(password)) return message;
+  }
+  return null;
+};
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
-  const passwordMismatch =
-    confirmPassword.length > 0 && password !== confirmPassword;
+  const router = useRouter();
+
+  // useTransition keeps the UI responsive during the async sign-up call.
+  // isPending drives the button's loading state without a separate boolean.
+  const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("register", { name, email, password });
+
+    // 1. Client-side validation — synchronous, zero latency.
+    const error = validateForm({ name, email, imageUrl, password });
+    if (error) {
+      toast.error(error);
+      return; // bail out before touching the network
+    }
+
+    // 2. Wrap async work in a transition so React can batch state updates
+    //    and keep the rest of the UI interactive while the request is in flight.
+    startTransition(async () => {
+      try {
+        // Simulate network latency during development
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        toast.success(
+          "Account created! Welcome to RecipeHub. Please login to continue.",
+        );
+        router.push("/login");
+      } catch (err) {
+        // Surface server-side errors (duplicate email, etc.) directly to the user.
+        const message =
+          err?.message ?? "Something went wrong. Please try again.";
+        toast.error(message);
+      }
+    });
   };
 
   return (
@@ -48,6 +116,7 @@ const RegisterPage = () => {
           noValidate
           className="flex flex-col gap-5"
         >
+          {/* Name */}
           <FormField htmlFor="reg-name" label="Display name">
             <Input
               id="reg-name"
@@ -56,9 +125,12 @@ const RegisterPage = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Elena Marsh"
               autoComplete="name"
+              required
+              disabled={isPending}
             />
           </FormField>
 
+          {/* Email */}
           <FormField htmlFor="reg-email" label="Email address">
             <Input
               id="reg-email"
@@ -67,9 +139,32 @@ const RegisterPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
+              required
+              disabled={isPending}
             />
           </FormField>
 
+          {/* Image URL */}
+          <FormField htmlFor="reg-image" label="Profile image URL" optional>
+            <div className="relative">
+              <ImageIcon
+                className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none"
+                aria-hidden
+              />
+              <Input
+                id="reg-image"
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://example.com/avatar.jpg"
+                autoComplete="photo"
+                className="pl-8"
+                disabled={isPending}
+              />
+            </div>
+          </FormField>
+
+          {/* Password */}
           <FormField htmlFor="reg-password" label="Password">
             <div className="relative">
               <Input
@@ -80,12 +175,15 @@ const RegisterPage = () => {
                 placeholder="••••••••"
                 autoComplete="new-password"
                 className="pr-10"
+                required
+                disabled={isPending}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-150 focus-visible:outline-none"
+                tabIndex={-1}
               >
                 {showPassword ? (
                   <EyeOff className="size-4" aria-hidden />
@@ -94,51 +192,17 @@ const RegisterPage = () => {
                 )}
               </button>
             </div>
+            {/* Inline strength checklist — only visible while typing */}
             {password.length > 0 && <PasswordStrength password={password} />}
-          </FormField>
-
-          <FormField htmlFor="reg-confirm" label="Confirm password">
-            <div className="relative">
-              <Input
-                id="reg-confirm"
-                type={showConfirm ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="new-password"
-                aria-invalid={passwordMismatch}
-                className={cn(
-                  "pr-10",
-                  passwordMismatch &&
-                    "border-destructive focus-visible:ring-destructive/30",
-                )}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm((v) => !v)}
-                aria-label={showConfirm ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-150 focus-visible:outline-none"
-              >
-                {showConfirm ? (
-                  <EyeOff className="size-4" aria-hidden />
-                ) : (
-                  <Eye className="size-4" aria-hidden />
-                )}
-              </button>
-            </div>
-            {passwordMismatch && (
-              <p className="text-[12px] font-sans text-destructive">
-                Passwords don&apos;t match.
-              </p>
-            )}
           </FormField>
 
           <Button
             type="submit"
             variant="default"
             className="w-full h-10 font-sans text-[14px] font-medium mt-1"
+            disabled={isPending}
           >
-            Create account
+            {isPending ? "Creating account…" : "Create account"}
           </Button>
         </form>
 
@@ -154,6 +218,7 @@ const RegisterPage = () => {
           type="button"
           variant="outline"
           className="w-full h-10 font-sans text-[14px] font-medium gap-2.5"
+          disabled={isPending}
           onClick={() => console.log("google sign up")}
         >
           <FcGoogle className="size-4.5 shrink-0" aria-hidden />
