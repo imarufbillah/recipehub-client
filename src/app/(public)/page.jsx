@@ -2,6 +2,7 @@ import Image from "next/image";
 import Hero from "@/components/home/Hero";
 import FeaturedRecipes from "@/components/home/FeaturedRecipes";
 import PopularRecipes from "@/components/home/PopularRecipes";
+import BrowseByCuisine from "@/components/home/BrowseByCuisine";
 
 const Home = () => {
   return (
@@ -30,6 +31,9 @@ const Home = () => {
 
       {/* Popular Recipes — compact thumbnail-left cards, secondary bg break */}
       <PopularRecipes />
+
+      {/* Browse by Cuisine — asymmetric editorial photo-tile grid */}
+      <BrowseByCuisine />
     </>
   );
 };
