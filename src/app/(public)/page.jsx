@@ -3,6 +3,7 @@ import Hero from "@/components/home/Hero";
 import FeaturedRecipes from "@/components/home/FeaturedRecipes";
 import PopularRecipes from "@/components/home/PopularRecipes";
 import BrowseByCuisine from "@/components/home/BrowseByCuisine";
+import TrustSection from "@/components/home/TrustSection";
 
 const Home = () => {
   return (
@@ -34,6 +35,9 @@ const Home = () => {
 
       {/* Browse by Cuisine — asymmetric editorial photo-tile grid */}
       <BrowseByCuisine />
+
+      {/* Trust / Value — magazine pull-quote layout, dark section */}
+      <TrustSection />
     </>
   );
 };
