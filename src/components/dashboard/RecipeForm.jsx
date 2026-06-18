@@ -4,91 +4,26 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import FormField from "@/components/ui/FormField";
 import { cn } from "@/lib/utils";
 
 /**
- * RecipeForm — Add / Edit recipe form. Client component.
+ * RecipeForm — Add / Edit recipe form.
  *
- * Design system Input Field pattern throughout:
- *  - Label positioned ABOVE each field in micro-label style (11px uppercase
- *    tracking-[0.08em]) — never floating inside.
- *  - Card or background fill, border token outline, radius-md.
- *  - Focus: 2px ring-ring outline, no colored glow.
- *
- * Special fields:
- *  - Image drop-zone: dashed border, muted icon + instruction text centered.
- *    On file select: shows preview thumbnail with a remove ×-button.
- *  - Ingredients: repeating rows { qty, unit, name } — ghost "+ Add Ingredient"
- *    button appends a row, each row has a ghost Trash2 icon to remove it.
- *  - Steps: repeating rows { text, tip? } — same pattern.
- *
- * Submit: primary button bottom-right on wider viewports, full-width on mobile.
- *
- * Props:
- *  initialData — optional pre-filled values for edit mode
- *  onSubmit    — (formData) => void
- *  mode        — "add" | "edit" (controls submit button label)
+ * Primitives: shadcn Input, Textarea, Select, Switch, Label (via FormField).
+ * ImageDropZone and the Ingredients/Steps repeaters stay custom — no shadcn
+ * equivalent exists for file-drop or dynamic field arrays.
  */
-
-// ─── Field primitives ─────────────────────────────────────────────────────────
-
-const FieldLabel = ({ htmlFor, children, optional = false }) => (
-  <label
-    htmlFor={htmlFor}
-    className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans"
-  >
-    {children}
-    {optional && (
-      <span className="normal-case tracking-normal text-muted-foreground/60 ml-1">
-        (optional)
-      </span>
-    )}
-  </label>
-);
-
-const TextInput = ({ id, className, ...props }) => (
-  <input
-    id={id}
-    className={cn(
-      "w-full h-9 px-3 bg-background border border-input rounded-md",
-      "text-[14px] font-sans text-foreground placeholder:text-muted-foreground",
-      "focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring",
-      "transition-all duration-150",
-      className,
-    )}
-    {...props}
-  />
-);
-
-const SelectInput = ({ id, children, className, ...props }) => (
-  <select
-    id={id}
-    className={cn(
-      "w-full h-9 px-3 bg-background border border-input rounded-md",
-      "text-[14px] font-sans text-foreground",
-      "focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring",
-      "transition-all duration-150 appearance-none cursor-pointer",
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </select>
-);
-
-const TextareaInput = ({ id, className, ...props }) => (
-  <textarea
-    id={id}
-    className={cn(
-      "w-full px-3 py-2.5 bg-background border border-input rounded-md",
-      "text-[14px] font-sans text-foreground placeholder:text-muted-foreground",
-      "focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring",
-      "transition-all duration-150 resize-none",
-      className,
-    )}
-    {...props}
-  />
-);
 
 // ─── Image drop-zone ──────────────────────────────────────────────────────────
 
@@ -121,20 +56,16 @@ const ImageDropZone = ({ preview, onFileSelect, onRemove }) => {
           className="object-cover object-center"
           sizes="(max-width: 768px) 100vw, 600px"
         />
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={onRemove}
           aria-label="Remove image"
-          className={cn(
-            "absolute top-2 right-2 size-7 flex items-center justify-center",
-            "bg-card border border-border rounded-md",
-            "text-muted-foreground hover:text-foreground",
-            "transition-colors duration-150",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          )}
+          className="absolute top-2 right-2 bg-card border border-border hover:bg-card text-muted-foreground hover:text-foreground"
         >
           <X className="size-3.5" />
-        </button>
+        </Button>
       </div>
     );
   }
@@ -154,8 +85,7 @@ const ImageDropZone = ({ preview, onFileSelect, onRemove }) => {
       aria-label="Upload recipe image"
       className={cn(
         "w-full aspect-3/2 flex flex-col items-center justify-center gap-3",
-        "border-2 border-dashed rounded-md cursor-pointer",
-        "transition-colors duration-150",
+        "border-2 border-dashed rounded-md cursor-pointer transition-colors duration-150",
         dragging
           ? "border-primary bg-primary/5"
           : "border-border hover:border-muted-foreground/50 bg-muted/30",
@@ -205,8 +135,7 @@ const IngredientsRepeater = ({ items, onChange }) => {
     <div className="flex flex-col gap-2">
       {items.map((item, idx) => (
         <div key={item.id} className="flex items-center gap-2">
-          {/* Qty */}
-          <TextInput
+          <Input
             id={`ing-qty-${item.id}`}
             value={item.qty}
             onChange={(e) => update(item.id, "qty", e.target.value)}
@@ -214,8 +143,7 @@ const IngredientsRepeater = ({ items, onChange }) => {
             aria-label={`Ingredient ${idx + 1} quantity`}
             className="w-20 shrink-0"
           />
-          {/* Unit */}
-          <TextInput
+          <Input
             id={`ing-unit-${item.id}`}
             value={item.unit}
             onChange={(e) => update(item.id, "unit", e.target.value)}
@@ -223,8 +151,7 @@ const IngredientsRepeater = ({ items, onChange }) => {
             aria-label={`Ingredient ${idx + 1} unit`}
             className="w-20 shrink-0"
           />
-          {/* Name */}
-          <TextInput
+          <Input
             id={`ing-name-${item.id}`}
             value={item.name}
             onChange={(e) => update(item.id, "name", e.target.value)}
@@ -232,25 +159,19 @@ const IngredientsRepeater = ({ items, onChange }) => {
             aria-label={`Ingredient ${idx + 1} name`}
             className="flex-1 min-w-0"
           />
-          {/* Remove */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={() => remove(item.id)}
             aria-label={`Remove ingredient ${idx + 1}`}
             disabled={items.length <= 1}
-            className={cn(
-              "shrink-0 size-8 flex items-center justify-center rounded-md",
-              "text-muted-foreground/50 hover:text-destructive",
-              "transition-colors duration-150",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "disabled:opacity-30 disabled:cursor-not-allowed",
-            )}
+            className="shrink-0 text-muted-foreground/50 hover:text-destructive hover:bg-transparent"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       ))}
-
       <Button
         type="button"
         variant="ghost"
@@ -282,21 +203,20 @@ const StepsRepeater = ({ items, onChange }) => {
           key={step.id}
           className="flex gap-3 p-4 border border-border rounded-md bg-muted/20"
         >
-          {/* Step number — mono display texture */}
           <span className="shrink-0 font-mono text-[22px] leading-none text-muted-foreground/30 select-none pt-1.5">
             {String(idx + 1).padStart(2, "0")}
           </span>
-
           <div className="flex-1 flex flex-col gap-2">
-            <TextareaInput
+            <Textarea
               id={`step-text-${step.id}`}
               value={step.text}
               onChange={(e) => update(step.id, "text", e.target.value)}
               placeholder="Describe this step…"
               aria-label={`Step ${idx + 1} instructions`}
               rows={3}
+              className="resize-none"
             />
-            <TextInput
+            <Input
               id={`step-tip-${step.id}`}
               value={step.tip}
               onChange={(e) => update(step.id, "tip", e.target.value)}
@@ -304,26 +224,19 @@ const StepsRepeater = ({ items, onChange }) => {
               aria-label={`Step ${idx + 1} tip`}
             />
           </div>
-
-          {/* Remove */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={() => remove(step.id)}
             aria-label={`Remove step ${idx + 1}`}
             disabled={items.length <= 1}
-            className={cn(
-              "shrink-0 size-8 flex items-center justify-center rounded-md self-start",
-              "text-muted-foreground/50 hover:text-destructive",
-              "transition-colors duration-150",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "disabled:opacity-30 disabled:cursor-not-allowed",
-            )}
+            className="shrink-0 self-start text-muted-foreground/50 hover:text-destructive hover:bg-transparent"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       ))}
-
       <Button
         type="button"
         variant="ghost"
@@ -338,20 +251,12 @@ const StepsRepeater = ({ items, onChange }) => {
   );
 };
 
-// ─── Main form ────────────────────────────────────────────────────────────────
-
-// ─── Field wrapper — label-above + spacing, declared outside RecipeForm ──────
-// Must live at module scope so React sees a stable component reference across
-// renders. Defining it inside the render function causes the
-// react-hooks/static-components error (component recreated every render).
+// ─── Field wrapper — module scope (avoids react-hooks/static-components) ─────
 
 const Field = ({ id, label, optional, children }) => (
-  <div className="flex flex-col gap-1.5">
-    <FieldLabel htmlFor={id} optional={optional}>
-      {label}
-    </FieldLabel>
+  <FormField htmlFor={id} label={label} optional={optional}>
     {children}
-  </div>
+  </FormField>
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -420,14 +325,14 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
       noValidate
       className="flex flex-col gap-8 max-w-2xl"
     >
-      {/* ── Section: Basic info ── */}
+      {/* ── Basic info ── */}
       <section className="flex flex-col gap-5">
         <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
           Basic Information
         </p>
 
         <Field id="recipe-name" label="Recipe Name">
-          <TextInput
+          <Input
             id="recipe-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -437,37 +342,34 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
         </Field>
 
         <Field id="recipe-description" label="Short Description" optional>
-          <TextareaInput
+          <Textarea
             id="recipe-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="A one or two sentence description of the recipe…"
             rows={3}
+            className="resize-none"
           />
         </Field>
 
-        {/* Two-column row: category + cuisine */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field id="recipe-category" label="Category">
-            <SelectInput
-              id="recipe-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                Select category…
-              </option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </SelectInput>
+            <Select value={category} onValueChange={setCategory} required>
+              <SelectTrigger id="recipe-category" className="w-full">
+                <SelectValue placeholder="Select category…" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
 
           <Field id="recipe-cuisine" label="Cuisine">
-            <TextInput
+            <Input
               id="recipe-cuisine"
               value={cuisine}
               onChange={(e) => setCuisine(e.target.value)}
@@ -476,27 +378,24 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
           </Field>
         </div>
 
-        {/* Three-column row: difficulty + prep time + servings */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Field id="recipe-difficulty" label="Difficulty">
-            <SelectInput
-              id="recipe-difficulty"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-            >
-              <option value="" disabled>
-                Select…
-              </option>
-              {DIFFICULTIES.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </SelectInput>
+            <Select value={difficulty} onValueChange={setDifficulty}>
+              <SelectTrigger id="recipe-difficulty" className="w-full">
+                <SelectValue placeholder="Select…" />
+              </SelectTrigger>
+              <SelectContent>
+                {DIFFICULTIES.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
 
           <Field id="recipe-preptime" label="Prep Time">
-            <TextInput
+            <Input
               id="recipe-preptime"
               value={prepTime}
               onChange={(e) => setPrepTime(e.target.value)}
@@ -505,7 +404,7 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
           </Field>
 
           <Field id="recipe-servings" label="Servings">
-            <TextInput
+            <Input
               id="recipe-servings"
               value={servings}
               onChange={(e) => setServings(e.target.value)}
@@ -517,12 +416,11 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
         </div>
       </section>
 
-      {/* ── Section: Image ── */}
+      {/* ── Image ── */}
       <section className="flex flex-col gap-5">
         <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
           Recipe Photo
         </p>
-
         <Field id="recipe-image" label="Cover Image">
           <ImageDropZone
             preview={imagePreview}
@@ -532,13 +430,12 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
         </Field>
       </section>
 
-      {/* ── Section: Premium gating ── */}
+      {/* ── Premium gating ── */}
       <section className="flex flex-col gap-5">
         <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
-          Access & Pricing
+          Access &amp; Pricing
         </p>
 
-        {/* Toggle row */}
         <div className="flex items-center justify-between gap-4 py-3 px-4 border border-border rounded-md bg-muted/20">
           <div>
             <p className="text-[13px] font-sans font-medium text-foreground">
@@ -548,35 +445,22 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
               Require a one-time purchase to view ingredients and steps.
             </p>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isPremium}
-            onClick={() => setIsPremium((v) => !v)}
-            className={cn(
-              "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full",
-              "transition-colors duration-200",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              isPremium ? "bg-primary" : "bg-border",
-            )}
-          >
-            <span
-              className={cn(
-                "inline-block size-4 rounded-full bg-card shadow-sm",
-                "transition-transform duration-200",
-                isPremium ? "translate-x-4" : "translate-x-0.5",
-              )}
-            />
-          </button>
+          {/* shadcn Switch — replaces hand-rolled button[role=switch] */}
+          <Switch
+            id="premium-toggle"
+            checked={isPremium}
+            onCheckedChange={setIsPremium}
+            aria-label="Toggle premium recipe"
+          />
         </div>
 
         {isPremium && (
           <Field id="recipe-price" label="Price (USD)">
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-sans text-muted-foreground pointer-events-none">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-sans text-muted-foreground pointer-events-none z-10">
                 $
               </span>
-              <TextInput
+              <Input
                 id="recipe-price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
@@ -591,32 +475,28 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
         )}
       </section>
 
-      {/* ── Section: Ingredients ── */}
+      {/* ── Ingredients ── */}
       <section className="flex flex-col gap-5">
         <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
           Ingredients
         </p>
-
-        {/* Column header hint */}
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-muted-foreground/60 font-sans">
           <span className="w-20">Qty</span>
           <span className="w-20">Unit</span>
           <span className="flex-1">Name</span>
         </div>
-
         <IngredientsRepeater items={ingredients} onChange={setIngredients} />
       </section>
 
-      {/* ── Section: Instructions ── */}
+      {/* ── Instructions ── */}
       <section className="flex flex-col gap-5">
         <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
           Instructions
         </p>
-
         <StepsRepeater items={steps} onChange={setSteps} />
       </section>
 
-      {/* ── Submit row ── */}
+      {/* ── Submit ── */}
       <div className="flex items-center justify-between gap-4 pt-2 border-t border-border">
         <p className="text-[12px] font-sans text-muted-foreground hidden sm:block">
           {mode === "edit"
