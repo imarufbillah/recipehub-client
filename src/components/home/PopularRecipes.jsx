@@ -1,4 +1,4 @@
-import SectionHeader from "@/components/ui/SectionHeader";
+import AnimatedSectionHeader from "@/components/ui/AnimatedSectionHeader";
 import PopularRecipesGrid from "./PopularRecipesGrid";
 
 /**
@@ -106,7 +106,7 @@ const PopularRecipes = () => {
   return (
     <section className="w-full py-24 lg:py-32 bg-secondary">
       <div className="mx-auto max-w-360 px-6 md:px-10 lg:px-16 flex flex-col gap-10">
-        <SectionHeader
+        <AnimatedSectionHeader
           title="Popular Right Now"
           href="/recipes?sort=popular"
           linkLabel="See All"

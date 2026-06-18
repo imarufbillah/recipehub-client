@@ -1,4 +1,4 @@
-import SectionHeader from "@/components/ui/SectionHeader";
+import AnimatedSectionHeader from "@/components/ui/AnimatedSectionHeader";
 import CuisineGrid from "./CuisineGrid";
 
 /**
@@ -66,7 +66,7 @@ const BrowseByCuisine = () => {
   return (
     <section className="w-full py-24 lg:py-32">
       <div className="mx-auto max-w-360 px-6 md:px-10 lg:px-16 flex flex-col gap-10">
-        <SectionHeader
+        <AnimatedSectionHeader
           title="Browse by Cuisine"
           href="/recipes"
           linkLabel="All Cuisines"

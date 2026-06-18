@@ -91,7 +91,12 @@ const Hero = () => {
       </div>
 
       {/* ── Right column — 40% — editorial image, bleeds to viewport edge ── */}
-      <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[42%]">
+      <motion.div
+        className="hidden lg:block absolute right-0 top-0 bottom-0 w-[42%]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.0, ease: "easeOut", delay: 0.3 }}
+      >
         {/* Image — sharp corners (radius-sm only on left edge), full-bleed height */}
         <div className="relative h-full w-full overflow-hidden rounded-l-sm">
           <Image
@@ -123,7 +128,7 @@ const Hero = () => {
         >
           <HeroCaptionCard dish="Pasta al Pomodoro" meta="30 min · Serves 2" />
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* ── Mobile image — full-width, stacks below text (handled in page) ── */}
       {/* Mobile layout is managed via page-level stacking in page.jsx */}
