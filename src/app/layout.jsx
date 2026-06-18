@@ -1,6 +1,7 @@
 import { Bodoni_Moda, Fraunces, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/providers/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const displaySerif = Bodoni_Moda({
   variable: "--font-heading",
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );
