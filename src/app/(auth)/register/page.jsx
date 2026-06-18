@@ -12,6 +12,7 @@ import FormField from "@/components/ui/FormField";
 import PasswordStrength from "@/components/auth/PasswordStrength";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { signUp } from "@/lib/auth-client";
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 // Pure functions — run synchronously before any async work so the user gets
@@ -79,6 +80,13 @@ const RegisterPage = () => {
     //    and keep the rest of the UI interactive while the request is in flight.
     startTransition(async () => {
       try {
+        await signUp.email({
+          name,
+          email,
+          image: imageUrl,
+          password,
+        });
+
         // Simulate network latency during development
         await new Promise((resolve) => setTimeout(resolve, 800));
 
