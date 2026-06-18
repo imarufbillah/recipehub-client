@@ -9,7 +9,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 /**
  * UserMenuDropdown — the popover panel anchored below-right of the trigger.
@@ -79,9 +80,11 @@ const MenuItem = ({
 const UserMenuDropdown = ({ user, onClose }) => {
   const initial = user?.name?.[0]?.toUpperCase() ?? "?";
   const isAdmin = user?.role === "admin";
+  const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut();
+    await authClient.signOut();
+    router.push("/");
     onClose?.();
   };
 
