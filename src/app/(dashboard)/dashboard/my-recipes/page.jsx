@@ -5,14 +5,6 @@ import { getServerSession } from "@/lib/session";
 import { getRecipesByUserId } from "@/lib/apiClient";
 import MyRecipesTable from "@/components/dashboard/MyRecipesTable";
 
-const COLUMNS = [
-  { key: "recipeName", label: "Recipe" },
-  { key: "category", label: "Category", width: "w-28" },
-  { key: "cuisine", label: "Cuisine", width: "w-28" },
-  { key: "prepTime", label: "Prep Time", width: "w-24", mono: true },
-  { key: "status", label: "Status", width: "w-24", badge: true },
-];
-
 const MyRecipesPage = async () => {
   const { user } = await getServerSession();
 
@@ -21,11 +13,9 @@ const MyRecipesPage = async () => {
     const data = await getRecipesByUserId(user.id);
     recipes = Array.isArray(data) ? data : (data?.recipes ?? []);
   } catch {
-    // Render empty table — no crash, error is recoverable
     recipes = [];
   }
 
-  // Map API shape → flat row objects DashboardTable expects
   const rows = recipes.map((r) => ({
     id: r._id,
     recipeName: r.recipeName,
@@ -59,7 +49,7 @@ const MyRecipesPage = async () => {
         </Button>
       </div>
 
-      <MyRecipesTable columns={COLUMNS} rows={rows} />
+      <MyRecipesTable rows={rows} />
     </div>
   );
 };

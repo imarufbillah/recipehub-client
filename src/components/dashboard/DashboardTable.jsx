@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -230,6 +231,13 @@ const DashboardTable = ({
                         <span className="font-mono text-[12px] text-muted-foreground">
                           {row[col.key]}
                         </span>
+                      ) : col.hrefFn ? (
+                        <Link
+                          href={col.hrefFn(row)}
+                          className="hover:text-primary hover:underline underline-offset-2 transition-colors duration-150"
+                        >
+                          {row[col.key]}
+                        </Link>
                       ) : (
                         row[col.key]
                       )}
