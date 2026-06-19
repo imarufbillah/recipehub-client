@@ -19,6 +19,7 @@ import {
   ChefHat,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 /**
  * Dashboard Sidebar — client component.
@@ -97,10 +98,15 @@ const NavItem = ({ href, label, icon: Icon, isActive }) => (
 const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
   const navItems = role === "admin" ? ADMIN_NAV : USER_NAV;
 
-  const isActive = (item) =>
-    item.exact
-      ? pathname === item.href
-      : pathname.startsWith(item.href) && item.href !== "/dashboard";
+  // Derive initials from the real user.name field
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "U";
 
   // Special case: exact match for overview
   const isItemActive = (item) => {
@@ -146,11 +152,21 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
       {/* ── User identity block ── */}
       <div className="px-4 py-4 border-t border-sidebar-border">
         <div className="flex items-center gap-3">
-          {/* Avatar circle — initials, muted bg */}
-          <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <span className="text-[11px] font-sans font-semibold text-muted-foreground uppercase tracking-[0.04em]">
-              {user?.avatarInitials ?? "U"}
-            </span>
+          {/* Avatar — real image if available, else initials */}
+          <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+            {user?.image ? (
+              <Image
+                src={user.image}
+                alt={user.name ?? "avatar"}
+                width={400}
+                height={400}
+                className="size-full object-cover"
+              />
+            ) : (
+              <span className="text-[11px] font-sans font-semibold text-muted-foreground uppercase tracking-[0.04em]">
+                {initials}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col min-w-0">
@@ -158,7 +174,11 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
               {user?.name ?? "User"}
             </span>
             <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans leading-tight">
-              {role === "admin" ? "Administrator" : "Member"}
+              {role === "admin"
+                ? "Administrator"
+                : user?.plan === "premium"
+                  ? "Premium"
+                  : "Member"}
             </span>
           </div>
         </div>

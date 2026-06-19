@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 import ThemeToggle from "@/components/navbar/ThemeToggle";
 import DashboardSidebar from "./DashboardSidebar";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 /**
  * Dashboard Header — client component.
@@ -27,6 +28,15 @@ import { cn } from "@/lib/utils";
  */
 const DashboardHeader = ({ title, role = "user", user }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "U";
 
   return (
     <>
@@ -69,18 +79,28 @@ const DashboardHeader = ({ title, role = "user", user }) => {
         <div className="flex items-center gap-1">
           <ThemeToggle />
 
-          {/* Avatar chip — initials, muted bg, acts as menu trigger placeholder */}
+          {/* Avatar chip — real image or initials, acts as menu trigger placeholder */}
           <button
             type="button"
             aria-label="User menu"
             className={cn(
-              "ml-1 size-8 rounded-full bg-muted flex items-center justify-center",
+              "ml-1 size-8 rounded-full bg-muted flex items-center justify-center overflow-hidden",
               "text-[11px] font-sans font-semibold text-muted-foreground uppercase tracking-[0.04em]",
-              "hover:bg-muted/80 transition-colors duration-150",
+              "hover:opacity-80 transition-opacity duration-150",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             )}
           >
-            {user?.avatarInitials ?? "U"}
+            {user?.image ? (
+              <Image
+                src={user.image}
+                alt={user.name ?? "avatar"}
+                width={400}
+                height={400}
+                className="size-full object-cover"
+              />
+            ) : (
+              initials
+            )}
           </button>
         </div>
       </header>

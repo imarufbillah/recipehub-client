@@ -1,35 +1,37 @@
 import UserOverview from "@/components/dashboard/UserOverview";
 import AdminOverview from "@/components/dashboard/AdminOverview";
+import { getServerSession } from "@/lib/session";
 
 /**
- * Dashboard overview page — role-conditional content.
+ * Dashboard overview page — server component.
  *
- * Static mock role — replace with real session check when better-auth
- * is wired. The MOCK_USER.role in layout.jsx is the single source of truth
- * for the current session; this page reads from the same mock constant.
+ * Reads the real session from getServerSession (same call the layout makes),
+ * derives stats from the live user object, and renders the role-appropriate
+ * overview component.
  *
- * Admin Mode density differences are handled inside AdminOverview (dense=true
- * on StatCard) — the page itself is identical in structure.
+ * User fields used: role, plan, recipes (recipe count stored on user doc).
+ * Admin stats come from the platform aggregate — left as placeholder values
+ * until a real API endpoint exists.
  */
+const OverviewPage = async () => {
+  const { user } = await getServerSession();
+  const role = user?.role ?? "user";
 
-// Mirrors layout.jsx MOCK_USER.role — replace both with session when ready
-const ROLE = "user"; // swap to "admin" to preview
+  const userStats = {
+    totalRecipes: user?.recipes ?? 0,
+    totalFavorites: 0, // TODO: fetch from API
+    totalLikes: 0, // TODO: fetch from API
+    isPremium: user?.plan === "premium",
+  };
 
-const USER_STATS = {
-  totalRecipes: 12,
-  totalFavorites: 47,
-  totalLikes: 318,
-  isPremium: false,
-};
+  // TODO: replace with real platform aggregate API call
+  const adminStats = {
+    totalUsers: 0,
+    totalRecipes: 0,
+    premiumMembers: 0,
+    totalReports: 0,
+  };
 
-const ADMIN_STATS = {
-  totalUsers: 3_842,
-  totalRecipes: 12_107,
-  premiumMembers: 924,
-  totalReports: 17,
-};
-
-const OverviewPage = () => {
   return (
     <div className="px-5 md:px-8 py-8">
       {/* Section header — sans, Admin Mode rules */}
@@ -38,16 +40,16 @@ const OverviewPage = () => {
           Overview
         </h2>
         <p className="mt-1 text-[13px] font-sans text-muted-foreground">
-          {ROLE === "admin"
+          {role === "admin"
             ? "Platform-wide statistics at a glance."
-            : "A summary of your activity on RecipeHub."}
+            : `Welcome back, ${user?.name?.split(" ")[0] ?? "there"}. Here's a summary of your activity.`}
         </p>
       </div>
 
-      {ROLE === "admin" ? (
-        <AdminOverview stats={ADMIN_STATS} />
+      {role === "admin" ? (
+        <AdminOverview stats={adminStats} />
       ) : (
-        <UserOverview stats={USER_STATS} />
+        <UserOverview stats={userStats} />
       )}
     </div>
   );

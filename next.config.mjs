@@ -8,6 +8,7 @@ const nextConfig = {
       },
     ],
     qualities: [70, 75, 80, 85, 90, 95, 100],
+    minimumCacheTTL: 0,
   },
 };
 
