@@ -1,75 +1,39 @@
-"use client";
-
 import Link from "next/link";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DashboardTable from "@/components/dashboard/DashboardTable";
+import { getServerSession } from "@/lib/session";
+import { getRecipesByUserId } from "@/lib/apiClient";
+import MyRecipesTable from "@/components/dashboard/MyRecipesTable";
 
 const COLUMNS = [
-  { key: "name", label: "Recipe" },
+  { key: "recipeName", label: "Recipe" },
   { key: "category", label: "Category", width: "w-28" },
-  { key: "submitted", label: "Published", width: "w-28" },
-  { key: "likes", label: "Likes", width: "w-16" },
+  { key: "cuisine", label: "Cuisine", width: "w-28" },
+  { key: "prepTime", label: "Prep Time", width: "w-24", mono: true },
   { key: "status", label: "Status", width: "w-24", badge: true },
 ];
 
-const ROWS = [
-  {
-    id: "r1",
-    name: "Miso-Glazed Salmon with Sesame Greens",
-    category: "Dinner",
-    submitted: "Feb 14, 2024",
-    likes: 342,
-    status: "Featured",
-  },
-  {
-    id: "r2",
-    name: "Sourdough French Toast with Whipped Ricotta",
-    category: "Breakfast",
-    submitted: "Mar 3, 2024",
-    likes: 218,
-    status: "Active",
-  },
-  {
-    id: "r3",
-    name: "Burrata with Heirloom Tomatoes & Basil Oil",
-    category: "Lunch",
-    submitted: "Mar 20, 2024",
-    likes: 175,
-    status: "Active",
-  },
-  {
-    id: "r4",
-    name: "Roasted Red Pepper & Tomato Soup",
-    category: "Vegetarian",
-    submitted: "Aug 27, 2024",
-    likes: 124,
-    status: "Active",
-  },
-  {
-    id: "r5",
-    name: "Cardamom & Orange Flourless Cake",
-    category: "Dessert",
-    submitted: "Sep 15, 2024",
-    likes: 89,
-    status: "Pending",
-  },
-];
+const MyRecipesPage = async () => {
+  const { user } = await getServerSession();
 
-const MyRecipesPage = () => {
-  const actions = [
-    {
-      icon: Pencil,
-      label: "Edit recipe",
-      onClick: (row) => console.log("edit", row.id),
-    },
-    {
-      icon: Trash2,
-      label: "Delete recipe",
-      onClick: (row) => console.log("delete", row.id),
-      variant: "destructive",
-    },
-  ];
+  let recipes = [];
+  try {
+    const data = await getRecipesByUserId(user.id);
+    recipes = Array.isArray(data) ? data : (data?.recipes ?? []);
+  } catch {
+    // Render empty table — no crash, error is recoverable
+    recipes = [];
+  }
+
+  // Map API shape → flat row objects DashboardTable expects
+  const rows = recipes.map((r) => ({
+    id: r._id,
+    recipeName: r.recipeName,
+    category: r.category ?? "—",
+    cuisine: r.cuisine ?? "—",
+    prepTime: r.prepTime ? `${r.prepTime} min` : "—",
+    status: r.status ?? "active",
+  }));
 
   return (
     <div className="px-5 md:px-8 py-8">
@@ -94,12 +58,8 @@ const MyRecipesPage = () => {
           </Link>
         </Button>
       </div>
-      <DashboardTable
-        columns={COLUMNS}
-        rows={ROWS}
-        actions={actions}
-        pageSize={10}
-      />
+
+      <MyRecipesTable columns={COLUMNS} rows={rows} />
     </div>
   );
 };

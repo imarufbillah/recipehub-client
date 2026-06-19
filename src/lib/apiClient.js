@@ -39,3 +39,5 @@ const request = async (method, path, body) => {
 // ─── Recipes ──────────────────────────────────────────────────────────────────
 
 export const createRecipe = (data) => request("POST", "/recipes", data);
+export const getRecipesByUserId = (userId) =>
+  request("GET", `/recipes/${userId}`);
