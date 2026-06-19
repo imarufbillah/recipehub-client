@@ -1,10 +1,13 @@
 import RecipeForm from "@/components/dashboard/RecipeForm";
+import { getServerSession } from "@/lib/session";
 
 /**
  * Add Recipe page — user dashboard.
  * RecipeForm handles all client state; this page is a server component shell.
  */
-const AddRecipePage = () => {
+const AddRecipePage = async () => {
+  const { user } = await getServerSession();
+
   return (
     <div className="px-5 md:px-8 py-8">
       <div className="mb-8">
@@ -16,7 +19,7 @@ const AddRecipePage = () => {
         </p>
       </div>
 
-      <RecipeForm mode="add" />
+      <RecipeForm user={user} mode="add" />
     </div>
   );
 };

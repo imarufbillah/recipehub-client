@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useTransition } from "react";
 import Image from "next/image";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import FormField from "@/components/ui/FormField";
 import { cn } from "@/lib/utils";
+import uploadToImgbb from "@/lib/uploadToImgbb";
 
 /**
  * RecipeForm — Add / Edit recipe form.
@@ -272,7 +273,7 @@ const CATEGORIES = [
 ];
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
 
-const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
+const RecipeForm = ({ user, initialData, mode = "add" }) => {
   const [name, setName] = useState(initialData?.name ?? "");
   const [description, setDescription] = useState(
     initialData?.description ?? "",
@@ -286,24 +287,47 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
   const [price, setPrice] = useState(initialData?.price ?? "");
   const [imagePreview, setImagePreview] = useState(initialData?.image ?? null);
   const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(initialData?.image ?? null);
   const [ingredients, setIngredients] = useState(
     initialData?.ingredients ?? [emptyIngredient()],
   );
   const [steps, setSteps] = useState(initialData?.steps ?? [emptyStep()]);
+  const [uploadError, setUploadError] = useState(null);
+  const [isUploading, startUpload] = useTransition();
 
   const handleImageSelect = (file) => {
-    setImageFile(file);
+    // Show local preview immediately — no waiting on the network
     setImagePreview(URL.createObjectURL(file));
+    setImageFile(file);
+    setImageUrl(null);
+    setUploadError(null);
+
+    // Upload in a non-blocking transition
+    startUpload(async () => {
+      try {
+        const url = await uploadToImgbb(file);
+        setImageUrl(url);
+      } catch (err) {
+        setUploadError("Image upload failed. Please try again.");
+        setImagePreview(null);
+        setImageFile(null);
+      }
+    });
   };
 
   const handleImageRemove = () => {
     setImageFile(null);
     setImagePreview(null);
+    setImageUrl(null);
+    setUploadError(null);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit?.({
+
+    if (isUploading) return; // upload still in flight
+
+    console.log({
       name,
       description,
       category,
@@ -313,9 +337,10 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
       servings,
       isPremium,
       price,
-      imageFile,
+      imageUrl,
       ingredients,
       steps,
+      userId: user?.id ?? null,
     });
   };
 
@@ -427,6 +452,21 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
             onFileSelect={handleImageSelect}
             onRemove={handleImageRemove}
           />
+          {isUploading && (
+            <p className="mt-2 text-[12px] font-sans text-muted-foreground animate-pulse">
+              Uploading image…
+            </p>
+          )}
+          {uploadError && (
+            <p className="mt-2 text-[12px] font-sans text-destructive">
+              {uploadError}
+            </p>
+          )}
+          {imageUrl && !isUploading && (
+            <p className="mt-2 text-[12px] font-sans text-muted-foreground">
+              Image uploaded successfully.
+            </p>
+          )}
         </Field>
       </section>
 
@@ -507,9 +547,14 @@ const RecipeForm = ({ initialData, onSubmit, mode = "add" }) => {
           type="submit"
           variant="default"
           size="lg"
+          disabled={isUploading}
           className="w-full sm:w-auto px-8 font-sans text-[13px] font-medium shrink-0"
         >
-          {mode === "edit" ? "Save Changes" : "Publish Recipe"}
+          {isUploading
+            ? "Uploading image…"
+            : mode === "edit"
+              ? "Save Changes"
+              : "Publish Recipe"}
         </Button>
       </div>
     </form>
