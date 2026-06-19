@@ -43,3 +43,5 @@ export const getRecipesByUserId = (userId) =>
   request("GET", `/recipes/${userId}`);
 export const updateRecipe = (recipeId, data) =>
   request("PATCH", `/recipes/${recipeId}`, data);
+export const deleteRecipe = (recipeId) =>
+  request("DELETE", `/recipes/${recipeId}`);

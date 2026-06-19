@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { deleteRecipe } from "@/lib/apiClient";
 
 /**
  * DeleteRecipeModal — destructive confirmation dialog.
@@ -49,15 +50,11 @@ const DeleteRecipeModal = ({
 
   const handleDelete = () => {
     startDelete(async () => {
-      await toast.promise(
-        // TODO: replace with deleteRecipe(recipeId) once wired in apiClient
-        new Promise((resolve) => setTimeout(resolve, 800)),
-        {
-          loading: "Deleting recipe…",
-          success: "Recipe deleted.",
-          error: (err) => err?.message ?? "Could not delete the recipe.",
-        },
-      );
+      toast.promise(await deleteRecipe(recipeId), {
+        loading: "Deleting recipe…",
+        success: "Recipe deleted.",
+        error: (err) => err?.message ?? "Could not delete the recipe.",
+      });
       onDeleted?.(recipeId);
       onClose();
     });
