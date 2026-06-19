@@ -1,17 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import DashboardTable from "@/components/dashboard/DashboardTable";
+import DeleteRecipeModal from "@/components/dashboard/DeleteRecipeModal";
 
-/**
- * MyRecipesTable — client island for the My Recipes page.
- *
- * Owns the interactive action handlers so the parent page stays a server component.
- * Columns are defined here so the `hrefFn` closures stay client-side.
- */
-const MyRecipesTable = ({ rows }) => {
+const MyRecipesTable = ({ rows: initialRows }) => {
   const router = useRouter();
+
+  // Local copy of rows so we can optimistically remove a deleted row
+  const [rows, setRows] = useState(initialRows);
+
+  // Modal state — null when closed, { id, name } when open
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const handleDeleted = (deletedId) => {
+    setRows((prev) => prev.filter((r) => r.id !== deletedId));
+  };
 
   const columns = [
     {
@@ -34,23 +40,33 @@ const MyRecipesTable = ({ rows }) => {
     {
       icon: Pencil,
       label: "Edit recipe",
-      onClick: (row) => console.log("edit", row.id),
+      onClick: (row) => router.push(`/dashboard/edit-recipe/${row.id}`),
     },
     {
       icon: Trash2,
       label: "Delete recipe",
-      onClick: (row) => console.log("delete", row.id),
+      onClick: (row) => setDeleteTarget({ id: row.id, name: row.recipeName }),
       variant: "destructive",
     },
   ];
 
   return (
-    <DashboardTable
-      columns={columns}
-      rows={rows}
-      actions={actions}
-      pageSize={10}
-    />
+    <>
+      <DashboardTable
+        columns={columns}
+        rows={rows}
+        actions={actions}
+        pageSize={10}
+      />
+
+      <DeleteRecipeModal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        recipeId={deleteTarget?.id}
+        recipeName={deleteTarget?.name}
+        onDeleted={handleDeleted}
+      />
+    </>
   );
 };
 
