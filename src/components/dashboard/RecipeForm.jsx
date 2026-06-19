@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useTransition } from "react";
 import Image from "next/image";
 import { Plus, Trash2, Upload, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +18,8 @@ import {
 import FormField from "@/components/ui/FormField";
 import { cn } from "@/lib/utils";
 import uploadToImgbb from "@/lib/uploadToImgbb";
+import { createRecipe } from "@/lib/apiClient";
+import { useRouter } from "next/navigation";
 
 /**
  * RecipeForm — Add / Edit recipe form.
@@ -274,7 +277,7 @@ const CATEGORIES = [
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
 
 const RecipeForm = ({ user, initialData, mode = "add" }) => {
-  const [name, setName] = useState(initialData?.name ?? "");
+  const [recipeName, setName] = useState(initialData?.name ?? "");
   const [description, setDescription] = useState(
     initialData?.description ?? "",
   );
@@ -294,6 +297,9 @@ const RecipeForm = ({ user, initialData, mode = "add" }) => {
   const [steps, setSteps] = useState(initialData?.steps ?? [emptyStep()]);
   const [uploadError, setUploadError] = useState(null);
   const [isUploading, startUpload] = useTransition();
+  const [isPending, startSubmit] = useTransition();
+
+  const router = useRouter();
 
   const handleImageSelect = (file) => {
     // Show local preview immediately — no waiting on the network
@@ -322,13 +328,34 @@ const RecipeForm = ({ user, initialData, mode = "add" }) => {
     setUploadError(null);
   };
 
+  const resetForm = () => {
+    setName("");
+    setDescription("");
+    setCategory("");
+    setCuisine("");
+    setDifficulty("");
+    setPrepTime("");
+    setServings("");
+    setIsPremium(false);
+    setPrice("");
+    setImageFile(null);
+    setImagePreview(null);
+    setImageUrl(null);
+    setUploadError(null);
+    setIngredients([emptyIngredient()]);
+    setSteps([emptyStep()]);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isUploading || isPending) return;
 
-    if (isUploading) return; // upload still in flight
+    // Strip local UI-only `id` keys — the backend doesn't need them
+    const cleanIngredients = ingredients.map(({ id: _, ...rest }) => rest);
+    const cleanSteps = steps.map(({ id: _, ...rest }) => rest);
 
-    console.log({
-      name,
+    const payload = {
+      recipeName,
       description,
       category,
       cuisine,
@@ -338,9 +365,21 @@ const RecipeForm = ({ user, initialData, mode = "add" }) => {
       isPremium,
       price,
       imageUrl,
-      ingredients,
-      steps,
-      userId: user?.id ?? null,
+      ingredients: cleanIngredients,
+      steps: cleanSteps,
+      userId: user.id,
+    };
+
+    const apiFn = () => createRecipe(payload);
+
+    startSubmit(() => {
+      toast.promise(apiFn(), {
+        loading: "Publishing recipe…",
+        success: "Recipe published.",
+        error: (err) => err?.message ?? "Something went wrong.",
+      });
+      resetForm();
+      router.push("/dashboard/my-recipes");
     });
   };
 
@@ -359,7 +398,7 @@ const RecipeForm = ({ user, initialData, mode = "add" }) => {
         <Field id="recipe-name" label="Recipe Name">
           <Input
             id="recipe-name"
-            value={name}
+            value={recipeName}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Miso-Glazed Salmon with Sesame Greens"
             required
@@ -539,21 +578,19 @@ const RecipeForm = ({ user, initialData, mode = "add" }) => {
       {/* ── Submit ── */}
       <div className="flex items-center justify-between gap-4 pt-2 border-t border-border">
         <p className="text-[12px] font-sans text-muted-foreground hidden sm:block">
-          {mode === "edit"
-            ? "Changes are saved immediately after submission."
-            : "Your recipe will be visible to the community after publishing."}
+          Your recipe will be visible to the community after publishing.
         </p>
         <Button
           type="submit"
           variant="default"
           size="lg"
-          disabled={isUploading}
+          disabled={isUploading || isPending}
           className="w-full sm:w-auto px-8 font-sans text-[13px] font-medium shrink-0"
         >
           {isUploading
             ? "Uploading image…"
-            : mode === "edit"
-              ? "Save Changes"
+            : isPending
+              ? "Publishing…"
               : "Publish Recipe"}
         </Button>
       </div>
