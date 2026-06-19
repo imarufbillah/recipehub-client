@@ -41,3 +41,5 @@ const request = async (method, path, body) => {
 export const createRecipe = (data) => request("POST", "/recipes", data);
 export const getRecipesByUserId = (userId) =>
   request("GET", `/recipes/${userId}`);
+export const updateRecipe = (recipeId, data) =>
+  request("PATCH", `/recipes/${recipeId}`, data);
