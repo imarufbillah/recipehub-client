@@ -458,12 +458,14 @@ const RecipeForm = ({ user, initialData, mode = "add" }) => {
             </Select>
           </Field>
 
-          <Field id="recipe-preptime" label="Prep Time">
+          <Field id="recipe-preptime" label="Prep Time (in minutes)">
             <Input
               id="recipe-preptime"
               value={prepTime}
               onChange={(e) => setPrepTime(e.target.value)}
-              placeholder="e.g. 45 min"
+              placeholder="e.g. 45"
+              type="number"
+              min="1"
             />
           </Field>
 
