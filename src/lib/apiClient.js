@@ -57,3 +57,5 @@ export const getAllRecipeCategories = () =>
 
 export const likeRecipe = (data) => request("POST", "/likes", data);
 export const unlikeRecipe = (data) => request("DELETE", "/likes", data);
+export const getLikeStatus = ({ userId, recipeId }) =>
+  request("GET", `/likes/status?userId=${userId}&recipeId=${recipeId}`);

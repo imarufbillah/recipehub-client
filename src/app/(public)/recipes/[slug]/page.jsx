@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import RecipeDetailHero from "@/components/recipe-detail/RecipeDetailHero";
 import RecipeTitleBlock from "@/components/recipe-detail/RecipeTitleBlock";
 import RecipeDetailClient from "@/components/recipe-detail/RecipeDetailClient";
 import RecipeContentBody from "@/components/recipe-detail/RecipeContentBody";
-import { getRecipeById } from "@/lib/apiClient";
+import { getRecipeById, getLikeStatus } from "@/lib/apiClient";
+import { auth } from "@/lib/auth";
 
 /**
  * Recipe Detail page — server component.
@@ -75,13 +77,24 @@ const normaliseRecipe = (r) => ({
 
 const RecipeDetailPage = async ({ params }) => {
   const { slug } = await params;
-  const raw = await getRecipeById(slug);
+
+  // Fetch recipe and session in parallel; session needed for like status
+  const [raw, session] = await Promise.all([
+    getRecipeById(slug),
+    auth.api.getSession({ headers: await headers() }),
+  ]);
 
   if (!raw) {
     notFound();
   }
 
   const recipe = normaliseRecipe(raw);
+  const userId = session?.user?.id ?? null;
+
+  // Only fetch like status when there's a logged-in user
+  const initialLiked = userId
+    ? await getLikeStatus({ userId, recipeId: recipe.id }).catch(() => false)
+    : false;
 
   return (
     <>
@@ -117,7 +130,7 @@ const RecipeDetailPage = async ({ params }) => {
                   <RecipeDetailClient
                     recipeId={recipe.id}
                     initialLikes={recipe.likes}
-                    initialLiked={false}
+                    initialLiked={initialLiked}
                     initialFavorited={false}
                     isPremium={recipe.isPremium}
                     isPurchased={recipe.isPurchased}
@@ -149,7 +162,7 @@ const RecipeDetailPage = async ({ params }) => {
                 <RecipeDetailClient
                   recipeId={recipe.id}
                   initialLikes={recipe.likes}
-                  initialLiked={false}
+                  initialLiked={initialLiked}
                   initialFavorited={false}
                   isPremium={recipe.isPremium}
                   isPurchased={recipe.isPurchased}
