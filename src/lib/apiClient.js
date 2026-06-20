@@ -52,3 +52,8 @@ export const getRecipeById = (id) => request("GET", `/recipes/${id}`);
 
 export const getAllRecipeCategories = () =>
   request("GET", "/recipes/categories");
+
+// ─── Likes ──────────────────────────────────────────────────────────────────
+
+export const likeRecipe = (data) => request("POST", "/likes", data);
+export const unlikeRecipe = (data) => request("DELETE", "/likes", data);

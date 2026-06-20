@@ -6,6 +6,7 @@ import { Heart, Bookmark, Flag, Lock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { likeRecipe, unlikeRecipe } from "@/lib/apiClient";
 
 /**
  * Recipe action row — client component.
@@ -29,6 +30,8 @@ import { cn } from "@/lib/utils";
  *  price             — display string e.g. "$4.99"
  *  onReport          — callback to open the report modal
  *  onPurchase        — callback when buy button is clicked
+ *  userId            — current user's id (null if not logged in)
+ *  recipeId          — recipe's _id from the API
  */
 
 const IconPulse = ({ children, trigger }) => (
@@ -52,6 +55,8 @@ const RecipeActionRow = ({
   price = "$4.99",
   onReport,
   onPurchase,
+  userId = null,
+  recipeId,
 }) => {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikes);
@@ -59,11 +64,29 @@ const RecipeActionRow = ({
   const [likePulse, setLikePulse] = useState(0);
   const [favPulse, setFavPulse] = useState(0);
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    if (!userId) return; // must be logged in
+
     const next = !liked;
+
+    // Optimistic update
     setLiked(next);
     setLikeCount((c) => c + (next ? 1 : -1));
     setLikePulse((n) => n + 1);
+
+    const payload = { userId, recipeId };
+
+    try {
+      if (next) {
+        await likeRecipe(payload);
+      } else {
+        await unlikeRecipe(payload);
+      }
+    } catch {
+      // Revert on failure
+      setLiked(!next);
+      setLikeCount((c) => c + (next ? -1 : 1));
+    }
   };
 
   const handleFavorite = () => {

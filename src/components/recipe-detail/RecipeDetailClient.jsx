@@ -3,6 +3,7 @@
 import { useState } from "react";
 import RecipeActionRow from "./RecipeActionRow";
 import ReportModal from "./ReportModal";
+import { useClientSession } from "@/hooks/useClientSession";
 
 /**
  * Thin client island — owns only the modal open/close state and wires
@@ -10,6 +11,7 @@ import ReportModal from "./ReportModal";
  * Keeps the page itself a server component; only this shell is a client component.
  *
  * Props:
+ *  recipeId         — recipe's _id, forwarded to the like API
  *  initialLikes     — like count from server data
  *  initialLiked     — user-specific state (would come from session in real app)
  *  initialFavorited — user-specific state
@@ -18,6 +20,7 @@ import ReportModal from "./ReportModal";
  *  price            — display price string
  */
 const RecipeDetailClient = ({
+  recipeId,
   initialLikes,
   initialLiked,
   initialFavorited,
@@ -26,6 +29,8 @@ const RecipeDetailClient = ({
   price,
 }) => {
   const [reportOpen, setReportOpen] = useState(false);
+  const { user } = useClientSession();
+  const userId = user?.id ?? null;
 
   const handleReport = () => setReportOpen(true);
   const handleCloseReport = () => setReportOpen(false);
@@ -44,6 +49,8 @@ const RecipeDetailClient = ({
         isPurchased={isPurchased}
         price={price}
         onReport={handleReport}
+        userId={userId}
+        recipeId={recipeId}
       />
 
       <ReportModal

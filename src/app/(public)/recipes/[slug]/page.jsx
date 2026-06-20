@@ -115,6 +115,7 @@ const RecipeDetailPage = async ({ params }) => {
                 {/* Client island: action row + report modal */}
                 <div className="mt-8">
                   <RecipeDetailClient
+                    recipeId={recipe.id}
                     initialLikes={recipe.likes}
                     initialLiked={false}
                     initialFavorited={false}
@@ -146,6 +147,7 @@ const RecipeDetailPage = async ({ params }) => {
 
               <div className="mt-8">
                 <RecipeDetailClient
+                  recipeId={recipe.id}
                   initialLikes={recipe.likes}
                   initialLiked={false}
                   initialFavorited={false}
