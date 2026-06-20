@@ -46,6 +46,7 @@ export const updateRecipe = (recipeId, data) =>
 export const deleteRecipe = (recipeId) =>
   request("DELETE", `/recipes/${recipeId}`);
 export const getAllRecipes = () => request("GET", "/recipes");
+export const getRecipeById = (id) => request("GET", `/recipes/${id}`);
 
 // ─── Categories ──────────────────────────────────────────────────────────────────
 
