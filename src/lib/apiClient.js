@@ -49,4 +49,4 @@ export const getAllRecipes = () => request("GET", "/recipes");
 
 // ─── Categories ──────────────────────────────────────────────────────────────────
 
-export const getAllRecipeCategories = () => request("GET", "/categories");
+export const getAllRecipeCategories = () => request("GET", "/recipes/categories");
