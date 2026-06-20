@@ -56,7 +56,7 @@ const normaliseRecipe = (r) => ({
   price: r.price ? `$${r.price}` : null,
   // No author / likes / isPurchased in current API shape — safe defaults
   author: null,
-  likes: 0,
+  likes: r.likeCount ?? 0,
   isPurchased: false,
   // Flatten flat ingredients array into a single group
   ingredientGroups: [
