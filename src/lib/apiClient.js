@@ -59,3 +59,11 @@ export const likeRecipe = (data) => request("POST", "/likes", data);
 export const unlikeRecipe = (data) => request("DELETE", "/likes", data);
 export const getLikeStatus = ({ userId, recipeId }) =>
   request("GET", `/likes/status?userId=${userId}&recipeId=${recipeId}`);
+
+// ─── Favorites ──────────────────────────────────────────────────────────────────
+
+export const addToFavorites = (data) => request("POST", "/favorites", data);
+export const removeFromFavorites = (data) =>
+  request("DELETE", "/favorites", data);
+export const getFavoriteStatus = ({ userId, recipeId }) =>
+  request("GET", `/favorites/status?userId=${userId}&recipeId=${recipeId}`);

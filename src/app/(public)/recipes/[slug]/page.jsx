@@ -4,7 +4,11 @@ import RecipeDetailHero from "@/components/recipe-detail/RecipeDetailHero";
 import RecipeTitleBlock from "@/components/recipe-detail/RecipeTitleBlock";
 import RecipeDetailClient from "@/components/recipe-detail/RecipeDetailClient";
 import RecipeContentBody from "@/components/recipe-detail/RecipeContentBody";
-import { getRecipeById, getLikeStatus } from "@/lib/apiClient";
+import {
+  getRecipeById,
+  getLikeStatus,
+  getFavoriteStatus,
+} from "@/lib/apiClient";
 import { auth } from "@/lib/auth";
 
 /**
@@ -39,6 +43,8 @@ import { auth } from "@/lib/auth";
  * imageUrl         → image  (also used as alt fallback)
  * prepTime (mins)  → prepTime ("25 min")
  * isPremium        → isPremium
+ * isFeatured       → featured (accent badge)
+ * price (number)   → price ("$3.99")
  * ingredients[]    → ingredientGroups[0].items  (flat list → single group)
  *   qty (number)   → qty (string)
  *   unit           → unit (optional)
@@ -56,11 +62,11 @@ const normaliseRecipe = (r) => ({
   prepTime: `${r.prepTime} min`,
   isPremium: r.isPremium ?? false,
   price: r.price ? `$${r.price}` : null,
-  // No author / likes / isPurchased in current API shape — safe defaults
+  // No author / isPurchased in current API shape — safe defaults
   author: null,
   likes: r.likeCount ?? 0,
   isPurchased: false,
-  // Flatten flat ingredients array into a single group
+  // Flatten ingredients array into a single group
   ingredientGroups: [
     {
       items: (r.ingredients ?? []).map((ing) => ({
@@ -78,7 +84,7 @@ const normaliseRecipe = (r) => ({
 const RecipeDetailPage = async ({ params }) => {
   const { slug } = await params;
 
-  // Fetch recipe and session in parallel; session needed for like status
+  // Fetch recipe and session in parallel; session needed for like/favorite status
   const [raw, session] = await Promise.all([
     getRecipeById(slug),
     auth.api.getSession({ headers: await headers() }),
@@ -91,10 +97,13 @@ const RecipeDetailPage = async ({ params }) => {
   const recipe = normaliseRecipe(raw);
   const userId = session?.user?.id ?? null;
 
-  // Only fetch like status when there's a logged-in user
-  const initialLiked = userId
-    ? await getLikeStatus({ userId, recipeId: recipe.id }).catch(() => false)
-    : false;
+  // Only fetch like/favorite status when there's a logged-in user
+  const [initialLiked, initialFavorited] = userId
+    ? await Promise.all([
+        getLikeStatus({ userId, recipeId: recipe.id }).catch(() => false),
+        getFavoriteStatus({ userId, recipeId: recipe.id }).catch(() => false),
+      ])
+    : [false, false];
 
   return (
     <>
@@ -131,7 +140,7 @@ const RecipeDetailPage = async ({ params }) => {
                     recipeId={recipe.id}
                     initialLikes={recipe.likes}
                     initialLiked={initialLiked}
-                    initialFavorited={false}
+                    initialFavorited={initialFavorited}
                     isPremium={recipe.isPremium}
                     isPurchased={recipe.isPurchased}
                     price={recipe.price}
@@ -163,7 +172,7 @@ const RecipeDetailPage = async ({ params }) => {
                   recipeId={recipe.id}
                   initialLikes={recipe.likes}
                   initialLiked={initialLiked}
-                  initialFavorited={false}
+                  initialFavorited={initialFavorited}
                   isPremium={recipe.isPremium}
                   isPurchased={recipe.isPurchased}
                   price={recipe.price}

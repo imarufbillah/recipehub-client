@@ -6,7 +6,12 @@ import { Heart, Bookmark, Flag, Lock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { likeRecipe, unlikeRecipe } from "@/lib/apiClient";
+import {
+  likeRecipe,
+  unlikeRecipe,
+  addToFavorites,
+  removeFromFavorites,
+} from "@/lib/apiClient";
 
 /**
  * Recipe action row — client component.
@@ -89,9 +94,27 @@ const RecipeActionRow = ({
     }
   };
 
-  const handleFavorite = () => {
-    setFavorited((f) => !f);
+  const handleFavorite = async () => {
+    if (!userId) return; // must be logged in
+
+    const next = !favorited;
+
+    // Optimistic update
+    setFavorited(next);
     setFavPulse((n) => n + 1);
+
+    const payload = { userId, recipeId };
+
+    try {
+      if (next) {
+        await addToFavorites(payload);
+      } else {
+        await removeFromFavorites(payload);
+      }
+    } catch {
+      // Revert on failure
+      setFavorited(!next);
+    }
   };
 
   const showPurchaseButton = isPremium && !isPurchased;
@@ -135,7 +158,7 @@ const RecipeActionRow = ({
         <button
           type="button"
           onClick={handleFavorite}
-          aria-label={favorited ? "Remove from favorites" : "Save to favorites"}
+          aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
           aria-pressed={favorited}
           className={cn(
             "group inline-flex items-center gap-2 px-3 py-2 rounded-md",
@@ -156,7 +179,7 @@ const RecipeActionRow = ({
             />
           </IconPulse>
           <span className="hidden sm:inline">
-            {favorited ? "Saved" : "Save"}
+            {favorited ? "Favorited" : "Favorite"}
           </span>
         </button>
       </div>
