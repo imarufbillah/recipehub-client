@@ -119,14 +119,7 @@ const BrowseRecipesContent = ({
     let result = recipes;
 
     if (activeCategory) {
-      result = result.filter(
-        (r) =>
-          r.categoryId === activeCategory ||
-          r.category?.toLowerCase() ===
-            categories
-              .find((c) => c.id === activeCategory)
-              ?.label?.toLowerCase(),
-      );
+      result = result.filter((r) => r.categoryId === activeCategory);
     }
 
     if (searchQuery.trim()) {
@@ -135,13 +128,12 @@ const BrowseRecipesContent = ({
         (r) =>
           r.name?.toLowerCase().includes(q) ||
           r.cuisine?.toLowerCase().includes(q) ||
-          r.category?.toLowerCase().includes(q) ||
-          r.author?.toLowerCase().includes(q),
+          r.category?.toLowerCase().includes(q),
       );
     }
 
     return result;
-  }, [recipes, activeCategory, searchQuery, categories]);
+  }, [recipes, activeCategory, searchQuery]);
 
   // Pagination
   const totalPages = Math.max(
