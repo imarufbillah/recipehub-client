@@ -40,7 +40,7 @@ const request = async (method, path, body) => {
 
 export const createRecipe = (data) => request("POST", "/recipes", data);
 export const getRecipesByUserId = (userId) =>
-  request("GET", `/recipes/${userId}`);
+  request("GET", `/recipes/user/${userId}`);
 export const updateRecipe = (recipeId, data) =>
   request("PATCH", `/recipes/${recipeId}`, data);
 export const deleteRecipe = (recipeId) =>
@@ -49,4 +49,5 @@ export const getAllRecipes = () => request("GET", "/recipes");
 
 // ─── Categories ──────────────────────────────────────────────────────────────────
 
-export const getAllRecipeCategories = () => request("GET", "/recipes/categories");
+export const getAllRecipeCategories = () =>
+  request("GET", "/recipes/categories");
