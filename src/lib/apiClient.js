@@ -73,3 +73,8 @@ export const getFavoriteStatus = ({ userId, recipeId }) =>
 export const createReport = (data) => request("POST", "/reports", data);
 export const getReportStatus = ({ userId, recipeId }) =>
   request("GET", `/reports/status?userId=${userId}&recipeId=${recipeId}`);
+
+// ─── Purchases ────────────────────────────────────────────────────────────────
+
+export const getPurchaseStatus = ({ userId, recipeId }) =>
+  request("GET", `/purchases/status?userId=${userId}&recipeId=${recipeId}`);

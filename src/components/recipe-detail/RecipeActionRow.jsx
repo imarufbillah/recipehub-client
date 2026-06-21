@@ -12,32 +12,7 @@ import {
   addToFavorites,
   removeFromFavorites,
 } from "@/lib/apiClient";
-
-/**
- * Recipe action row — client component.
- *
- * Left group: Like (heart + count) + Favorite (bookmark) — engagement actions.
- * Right group: Report (ghost, quieter visual weight) + Purchase button area.
- *
- * Purchase states:
- *  - Not purchased + isPremium: primary-filled button with lock icon + price.
- *  - Purchased / free: quiet confirmation chip (no dominant button).
- *
- * Motion: brief scale-pulse (max 1.1, 150ms ease-out) on Like/Favorite toggle.
- * Per design system: no bounce, max 2 properties, 250–450ms for UI transitions.
- *
- * Props:
- *  initialLikes      — starting like count (number)
- *  initialLiked      — whether current user has liked (boolean)
- *  initialFavorited  — whether current user has favorited (boolean)
- *  isPremium         — recipe requires purchase
- *  isPurchased       — user has already purchased
- *  price             — display string e.g. "$4.99"
- *  onReport          — callback to open the report modal
- *  onPurchase        — callback when buy button is clicked
- *  userId            — current user's id (null if not logged in)
- *  recipeId          — recipe's _id from the API
- */
+import handleCheckout from "@/lib/handleCheckout";
 
 const IconPulse = ({ children, trigger }) => (
   <motion.span
@@ -62,6 +37,9 @@ const RecipeActionRow = ({
   onPurchase,
   userId = null,
   recipeId,
+  recipeName,
+  recipeSlug,
+  priceAmount,
   hasReported = false,
 }) => {
   const [liked, setLiked] = useState(initialLiked);
@@ -69,6 +47,7 @@ const RecipeActionRow = ({
   const [favorited, setFavorited] = useState(initialFavorited);
   const [likePulse, setLikePulse] = useState(0);
   const [favPulse, setFavPulse] = useState(0);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const handleLike = async () => {
     if (!userId) return; // must be logged in
@@ -224,11 +203,24 @@ const RecipeActionRow = ({
               <Button
                 variant="default"
                 size="sm"
-                onClick={onPurchase}
+                disabled={checkoutLoading}
+                onClick={async () => {
+                  setCheckoutLoading(true);
+                  try {
+                    await handleCheckout({
+                      recipeId,
+                      recipeName,
+                      price: priceAmount,
+                      recipeSlug,
+                    });
+                  } finally {
+                    setCheckoutLoading(false);
+                  }
+                }}
                 className="gap-2 font-sans text-[13px] font-medium px-4"
               >
                 <Lock className="size-3.5 shrink-0" aria-hidden />
-                Unlock Recipe — {price}
+                {checkoutLoading ? "Redirecting…" : `Unlock Recipe — ${price}`}
               </Button>
             </motion.div>
           ) : showConfirmationChip ? (

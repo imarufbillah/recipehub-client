@@ -9,51 +9,13 @@ import {
   getLikeStatus,
   getFavoriteStatus,
   getReportStatus,
+  getPurchaseStatus,
 } from "@/lib/apiClient";
 import { auth } from "@/lib/auth";
 
-/**
- * Recipe Detail page — server component.
- *
- * Layout:
- *  ┌────────────────────────────────────────────────────────────┐
- *  │  HERO SPREAD  (full-width, asymmetric 55/45 desktop grid)  │
- *  │  ┌─────────────────────┐  ┌─────────────────────────────┐  │
- *  │  │  Image panel (55%)  │  │  Title block                │  │
- *  │  │  full-height        │  │  Author + metadata strip    │  │
- *  │  │  sharp corners      │  │  Action row (client island) │  │
- *  │  └─────────────────────┘  └─────────────────────────────┘  │
- *  └────────────────────────────────────────────────────────────┘
- *  ┌────────────────────────────────────────────────────────────┐
- *  │  CONTENT BODY  (5/12 ingredients | 7/12 instructions)     │
- *  └────────────────────────────────────────────────────────────┘
- *
- * On mobile: hero image stacks above title block, content columns stack.
- *
- * params is a Promise in Next.js 15+ — must be awaited.
- */
-
-// ─── Normaliser ───────────────────────────────────────────────────────────────
-
-/**
- * Map API recipe shape → component props.
- *
- * API field        → component field
- * _id              → id
- * recipeName       → name
- * imageUrl         → image  (also used as alt fallback)
- * prepTime (mins)  → prepTime ("25 min")
- * isPremium        → isPremium
- * isFeatured       → featured (accent badge)
- * price (number)   → price ("$3.99")
- * ingredients[]    → ingredientGroups[0].items  (flat list → single group)
- *   qty (number)   → qty (string)
- *   unit           → unit (optional)
- *   name           → name
- * steps[]          → steps  (already matches { text, tip? })
- */
 const normaliseRecipe = (r) => ({
   id: r._id,
+  slug: r._id, // slug == _id for API routes
   name: r.recipeName,
   image: r.imageUrl,
   alt: r.recipeName,
@@ -63,10 +25,10 @@ const normaliseRecipe = (r) => ({
   prepTime: `${r.prepTime} min`,
   isPremium: r.isPremium ?? false,
   price: r.price ? `$${r.price}` : null,
-  // No author / isPurchased in current API shape — safe defaults
+  priceAmount: r.price ?? null, // raw number for Stripe (e.g. 3.99)
+  // No author / isPurchased in current API shape — resolved separately
   author: null,
   likes: r.likeCount ?? 0,
-  isPurchased: false,
   // Flatten ingredients array into a single group
   ingredientGroups: [
     {
@@ -98,14 +60,15 @@ const RecipeDetailPage = async ({ params }) => {
   const recipe = normaliseRecipe(raw);
   const userId = session?.user?.id ?? null;
 
-  // Only fetch like/favorite/report status when there's a logged-in user
-  const [initialLiked, initialFavorited, initialReported] = userId
+  // Only fetch like/favorite/report/purchase status when there's a logged-in user
+  const [initialLiked, initialFavorited, initialReported, isPurchased] = userId
     ? await Promise.all([
         getLikeStatus({ userId, recipeId: recipe.id }).catch(() => false),
         getFavoriteStatus({ userId, recipeId: recipe.id }).catch(() => false),
         getReportStatus({ userId, recipeId: recipe.id }).catch(() => false),
+        getPurchaseStatus({ userId, recipeId: recipe.id }).catch(() => false),
       ])
-    : [false, false, false];
+    : [false, false, false, false];
 
   return (
     <>
@@ -140,12 +103,15 @@ const RecipeDetailPage = async ({ params }) => {
                 <div className="mt-8">
                   <RecipeDetailClient
                     recipeId={recipe.id}
+                    recipeName={recipe.name}
+                    recipeSlug={recipe.slug}
+                    priceAmount={recipe.priceAmount}
                     initialLikes={recipe.likes}
                     initialLiked={initialLiked}
                     initialFavorited={initialFavorited}
                     initialReported={initialReported}
                     isPremium={recipe.isPremium}
-                    isPurchased={recipe.isPurchased}
+                    isPurchased={isPurchased}
                     price={recipe.price}
                   />
                 </div>
@@ -173,12 +139,15 @@ const RecipeDetailPage = async ({ params }) => {
               <div className="mt-8">
                 <RecipeDetailClient
                   recipeId={recipe.id}
+                  recipeName={recipe.name}
+                  recipeSlug={recipe.slug}
+                  priceAmount={recipe.priceAmount}
                   initialLikes={recipe.likes}
                   initialLiked={initialLiked}
                   initialFavorited={initialFavorited}
                   initialReported={initialReported}
                   isPremium={recipe.isPremium}
-                  isPurchased={recipe.isPurchased}
+                  isPurchased={isPurchased}
                   price={recipe.price}
                 />
               </div>
