@@ -37,15 +37,15 @@ const REPORT_REASONS = [
   { id: "other", label: "Other" },
 ];
 
-const ReportModal = ({ open, onClose, onSubmit }) => {
+const ReportModal = ({ open, onClose, onSubmit, initialReported = false }) => {
   const [reason, setReason] = useState("");
   const [detail, setDetail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(initialReported);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!reason) return;
-    onSubmit?.(reason, detail);
+    await onSubmit?.(reason, detail);
     setSubmitted(true);
   };
 
@@ -56,7 +56,7 @@ const ReportModal = ({ open, onClose, onSubmit }) => {
       setTimeout(() => {
         setReason("");
         setDetail("");
-        setSubmitted(false);
+        setSubmitted(initialReported);
       }, 200);
     }
   };

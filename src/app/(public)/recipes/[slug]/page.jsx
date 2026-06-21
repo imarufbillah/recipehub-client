@@ -8,6 +8,7 @@ import {
   getRecipeById,
   getLikeStatus,
   getFavoriteStatus,
+  getReportStatus,
 } from "@/lib/apiClient";
 import { auth } from "@/lib/auth";
 
@@ -97,13 +98,14 @@ const RecipeDetailPage = async ({ params }) => {
   const recipe = normaliseRecipe(raw);
   const userId = session?.user?.id ?? null;
 
-  // Only fetch like/favorite status when there's a logged-in user
-  const [initialLiked, initialFavorited] = userId
+  // Only fetch like/favorite/report status when there's a logged-in user
+  const [initialLiked, initialFavorited, initialReported] = userId
     ? await Promise.all([
         getLikeStatus({ userId, recipeId: recipe.id }).catch(() => false),
         getFavoriteStatus({ userId, recipeId: recipe.id }).catch(() => false),
+        getReportStatus({ userId, recipeId: recipe.id }).catch(() => false),
       ])
-    : [false, false];
+    : [false, false, false];
 
   return (
     <>
@@ -141,6 +143,7 @@ const RecipeDetailPage = async ({ params }) => {
                     initialLikes={recipe.likes}
                     initialLiked={initialLiked}
                     initialFavorited={initialFavorited}
+                    initialReported={initialReported}
                     isPremium={recipe.isPremium}
                     isPurchased={recipe.isPurchased}
                     price={recipe.price}
@@ -173,6 +176,7 @@ const RecipeDetailPage = async ({ params }) => {
                   initialLikes={recipe.likes}
                   initialLiked={initialLiked}
                   initialFavorited={initialFavorited}
+                  initialReported={initialReported}
                   isPremium={recipe.isPremium}
                   isPurchased={recipe.isPurchased}
                   price={recipe.price}

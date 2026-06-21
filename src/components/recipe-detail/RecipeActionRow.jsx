@@ -62,6 +62,7 @@ const RecipeActionRow = ({
   onPurchase,
   userId = null,
   recipeId,
+  hasReported = false,
 }) => {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikes);
@@ -191,17 +192,22 @@ const RecipeActionRow = ({
           <button
             type="button"
             onClick={onReport}
+            disabled={hasReported}
             className={cn(
               "inline-flex items-center gap-1.5 px-2 py-2 rounded-md",
               "text-[11px] uppercase tracking-[0.06em] font-medium font-sans",
-              "text-muted-foreground/60 hover:text-muted-foreground",
               "transition-colors duration-200",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              hasReported
+                ? "text-destructive/60 cursor-default"
+                : "text-muted-foreground/60 hover:text-muted-foreground",
             )}
-            aria-label="Report this recipe"
+            aria-label={hasReported ? "Already reported" : "Report this recipe"}
           >
             <Flag className="size-3 shrink-0" aria-hidden />
-            <span className="hidden sm:inline">Report</span>
+            <span className="hidden sm:inline">
+              {hasReported ? "Reported" : "Report"}
+            </span>
           </button>
         )}
 
