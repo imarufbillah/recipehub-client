@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { stripe } from "@/lib/stripe";
+import { makePurchase } from "@/lib/apiClient";
 import PaymentSuccessAnimated from "@/components/payment/PaymentSuccessAnimated";
+import { getServerSession } from "@/lib/session";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -15,12 +13,10 @@ const formatAmount = (cents, currency = "usd") =>
     currency: currency.toUpperCase(),
   }).format(cents / 100);
 
-// Shorten the Stripe payment intent ID to a human-readable ref
-// e.g. "pi_3abc…XYZ" → "PI-XYZ" (last 6 chars, uppercased)
+// Shorten the payment intent ID to a readable ref: "pi_3abcXYZ" → "PI-XYZ"
 const shortRef = (paymentIntentId) => {
   if (!paymentIntentId) return "—";
-  const suffix = paymentIntentId.slice(-6).toUpperCase();
-  return `PI-${suffix}`;
+  return `PI-${paymentIntentId.slice(-6).toUpperCase()}`;
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -33,38 +29,56 @@ const PaymentSuccessPage = async ({ searchParams }) => {
   const fallbackTitle = params?.title ?? "Recipe";
   const redirectHref = params?.redirect ?? "/dashboard";
 
-  // No session ID → something went wrong, bounce to home
+  // No session ID → something went wrong
   if (!sessionId) redirect("/");
 
-  // Fetch the real session from Stripe — expand line_items for product name
+  // Fetch real session from Stripe — expand line_items and payment_intent
   let session;
   try {
     session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ["line_items", "payment_intent"],
     });
   } catch {
-    // Invalid / expired session ID — bounce gracefully
     redirect("/");
   }
 
-  // Guard: only show success for actually completed payments
+  // Only proceed for completed payments
   if (session.payment_status !== "paid") redirect("/");
 
+  // ── Record the purchase ─────────────────────────────────────────────────────
+  const authSession = await getServerSession();
+
+  if (authSession?.user) {
+    const userId = authSession.user.id;
+    const recipeId = session.metadata?.recipeId;
+
+    if (recipeId) {
+      await makePurchase({
+        userId,
+        recipeId,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent?.id ?? null,
+        amount: session.amount_total / 100,
+        currency: session.currency,
+        purchasedAt: new Date(
+          session.payment_intent?.created * 1000,
+        ).toISOString(),
+      }).catch((err) => {
+        console.error("[makePurchase]", err.message);
+      });
+    }
+  }
+
+  // ── Presentation data ───────────────────────────────────────────────────────
   const isPremiumUpgrade = type === "premium";
 
-  // Prefer the product name from the Stripe line item over the URL param
   const recipeTitle =
     session.line_items?.data?.[0]?.description ??
     session.line_items?.data?.[0]?.price?.product?.name ??
     fallbackTitle;
 
-  // Amount and currency straight from Stripe — authoritative
   const amountDisplay = formatAmount(session.amount_total, session.currency);
-
-  // Short human-readable reference from the payment intent ID
   const txnRef = shortRef(session.payment_intent?.id);
-
-  // Customer email confirmed by Stripe
   const customerEmail = session.customer_details?.email ?? null;
 
   const summaryLabel = isPremiumUpgrade ? "Premium Membership" : recipeTitle;
