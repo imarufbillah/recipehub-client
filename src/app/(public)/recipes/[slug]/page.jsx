@@ -167,6 +167,13 @@ const RecipeDetailPage = async ({ params }) => {
       <RecipeContentBody
         ingredientGroups={recipe.ingredientGroups}
         steps={recipe.steps}
+        isPremium={recipe.isPremium}
+        isPurchased={isPurchased}
+        recipeId={recipe.id}
+        recipeName={recipe.name}
+        recipeSlug={recipe.slug}
+        priceAmount={recipe.priceAmount}
+        price={recipe.price}
       />
     </>
   );
