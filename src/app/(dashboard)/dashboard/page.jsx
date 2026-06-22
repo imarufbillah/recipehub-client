@@ -2,25 +2,14 @@ import UserOverview from "@/components/dashboard/UserOverview";
 import AdminOverview from "@/components/dashboard/AdminOverview";
 import { getServerSession } from "@/lib/session";
 
-/**
- * Dashboard overview page — server component.
- *
- * Reads the real session from getServerSession (same call the layout makes),
- * derives stats from the live user object, and renders the role-appropriate
- * overview component.
- *
- * User fields used: role, plan, recipes (recipe count stored on user doc).
- * Admin stats come from the platform aggregate — left as placeholder values
- * until a real API endpoint exists.
- */
 const OverviewPage = async () => {
   const { user } = await getServerSession();
   const role = user?.role ?? "user";
 
   const userStats = {
     totalRecipes: user?.recipes ?? 0,
-    totalFavorites: 0, // TODO: fetch from API
-    totalLikes: 0, // TODO: fetch from API
+    totalFavorites: user?.totalFavorites ?? 0,
+    totalLikes: user?.totalLikes ?? 0,
     isPremium: user?.plan === "premium",
   };
 

@@ -36,6 +36,16 @@ export const auth = betterAuth({
         defaultValue: 0,
         input: false,
       },
+      totalFavorites: {
+        type: Number,
+        defaultValue: 0,
+        input: false,
+      },
+      totalLikes: {
+        type: Number,
+        defaultValue: 0,
+        input: false,
+      },
     },
   },
 });
