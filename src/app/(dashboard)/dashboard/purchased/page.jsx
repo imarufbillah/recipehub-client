@@ -1,44 +1,50 @@
 import Link from "next/link";
-import DashboardTable from "@/components/dashboard/DashboardTable";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getServerSession } from "@/lib/session";
+import { getPurchasesByUserId } from "@/lib/apiClient";
+import PurchasedTable from "@/components/dashboard/PurchasedTable";
 
-/**
- * Purchased — user dashboard page.
- *
- * Transaction reference IDs use the mono:true column flag so DashboardTable
- * renders them in font-mono (per design system: numeric IDs as data).
- * No actions on this view — purchased rows are read-only.
- */
+const formatDate = (iso) => {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
-const COLUMNS = [
-  { key: "name", label: "Recipe" },
-  { key: "author", label: "Author", width: "w-32" },
-  { key: "price", label: "Price", width: "w-20" },
-  { key: "date", label: "Date", width: "w-28" },
-  { key: "ref", label: "Ref", width: "w-32", mono: true },
-];
+const formatPrice = (price) => {
+  if (price == null) return "—";
+  return `$${Number(price).toFixed(2)}`;
+};
 
-const ROWS = [
-  {
-    id: "p1",
-    name: "Dark Chocolate & Tahini Tart",
-    author: "Nour Al-Rashid",
-    price: "$4.99",
-    date: "Jun 5, 2024",
-    ref: "TXN-00041A",
-  },
-  {
-    id: "p2",
-    name: "Duck Confit with Puy Lentils & Gremolata",
-    author: "Pierre Dubois",
-    price: "$3.99",
-    date: "Jul 22, 2024",
-    ref: "TXN-00087C",
-  },
-];
+const normalisePurchases = (raw = []) =>
+  raw.map((item) => ({
+    id: item._id,
+    // Kept separately so hrefFn can reference it
+    recipeId: item.recipeId,
+    recipeName: item.recipeName,
+    author: item.author ?? "—",
+    price: formatPrice(item.price),
+    purchasedAt: formatDate(item.purchasedAt),
+    // Stripe payment intent ID as the transaction reference
+    ref: item.stripePaymentIntentId ?? "—",
+  }));
 
-const PurchasedPage = () => {
+const PurchasedPage = async () => {
+  const { user } = await getServerSession();
+
+  let rows = [];
+  try {
+    const data = await getPurchasesByUserId(user.id);
+    rows = normalisePurchases(
+      Array.isArray(data) ? data : (data?.purchases ?? []),
+    );
+  } catch {
+    rows = [];
+  }
+
   return (
     <div className="px-5 md:px-8 py-8">
       <div className="mb-6">
@@ -50,13 +56,8 @@ const PurchasedPage = () => {
         </p>
       </div>
 
-      {ROWS.length > 0 ? (
-        <DashboardTable
-          columns={COLUMNS}
-          rows={ROWS}
-          actions={[]}
-          pageSize={10}
-        />
+      {rows.length > 0 ? (
+        <PurchasedTable rows={rows} />
       ) : (
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
           <ShoppingBag

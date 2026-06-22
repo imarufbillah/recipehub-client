@@ -81,3 +81,5 @@ export const getReportStatus = ({ userId, recipeId }) =>
 export const makePurchase = (data) => request("POST", "/purchases", data);
 export const getPurchaseStatus = ({ userId, recipeId }) =>
   request("GET", `/purchases/status?userId=${userId}&recipeId=${recipeId}`);
+export const getPurchasesByUserId = (userId) =>
+  request("GET", `/purchases/user/${userId}`);
