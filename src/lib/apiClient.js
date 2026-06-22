@@ -67,6 +67,8 @@ export const removeFromFavorites = (data) =>
   request("DELETE", "/favorites", data);
 export const getFavoriteStatus = ({ userId, recipeId }) =>
   request("GET", `/favorites/status?userId=${userId}&recipeId=${recipeId}`);
+export const getFavoritesByUserId = (userId) =>
+  request("GET", `/favorites/user/${userId}`);
 
 // ─── Reports ──────────────────────────────────────────────────────────────────
 
