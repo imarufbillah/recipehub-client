@@ -45,13 +45,44 @@ export const updateRecipe = (recipeId, data) =>
   request("PATCH", `/recipes/${recipeId}`, data);
 export const deleteRecipe = (recipeId) =>
   request("DELETE", `/recipes/${recipeId}`);
-export const getAllRecipes = () => request("GET", "/recipes");
+export const getAllRecipes = (params = {}) => {
+  const qs = new URLSearchParams();
+  const allowed = [
+    "q",
+    "category",
+    "cuisine",
+    "difficulty",
+    "isPremium",
+    "isFeatured",
+    "minPrice",
+    "maxPrice",
+    "maxPrepTime",
+    "sort",
+    "page",
+    "limit",
+  ];
+  for (const key of allowed) {
+    if (
+      params[key] !== undefined &&
+      params[key] !== null &&
+      params[key] !== ""
+    ) {
+      qs.set(key, String(params[key]));
+    }
+  }
+  const query = qs.toString();
+  return request("GET", `/recipes${query ? `?${query}` : ""}`);
+};
 export const getRecipeById = (id) => request("GET", `/recipes/${id}`);
 
 // ─── Categories ──────────────────────────────────────────────────────────────────
 
 export const getAllRecipeCategories = () =>
   request("GET", "/recipes/categories");
+
+// ─── Cuisines ──────────────────────────────────────────────────────────────────
+
+export const getAllRecipeCuisines = () => request("GET", "/recipes/cuisines");
 
 // ─── Likes ──────────────────────────────────────────────────────────────────
 
