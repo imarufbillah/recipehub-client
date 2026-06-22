@@ -125,6 +125,7 @@ const RecipeForm = ({ user, initialData }) => {
       ingredients: cleanIngredients,
       steps: cleanSteps,
       userId: user.id,
+      author: user.name,
     };
 
     startSubmit(async () => {
