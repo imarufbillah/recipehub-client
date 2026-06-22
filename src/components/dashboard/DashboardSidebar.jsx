@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,15 +8,13 @@ import {
   LayoutDashboard,
   BookOpen,
   PlusSquare,
-  Heart,
+  Bookmark,
   ShoppingBag,
   User,
   Users,
   ClipboardList,
   Flag,
-  Menu,
   X,
-  ChefHat,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -48,7 +46,7 @@ const USER_NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/my-recipes", label: "My Recipes", icon: BookOpen },
   { href: "/dashboard/add-recipe", label: "Add Recipe", icon: PlusSquare },
-  { href: "/dashboard/favorites", label: "Favorites", icon: Heart },
+  { href: "/dashboard/favorites", label: "Favorites", icon: Bookmark },
   { href: "/dashboard/purchased", label: "Purchased", icon: ShoppingBag },
   { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
