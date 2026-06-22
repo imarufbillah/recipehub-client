@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { Search, X, ChevronDown, SlidersHorizontal, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DIFFICULTIES, SORT_OPTIONS } from "@/app/(public)/recipes/page";
+import useDebounce from "@/hooks/useDebounce";
 
 const PREP_TIME_OPTIONS = [
   { label: "Any time", value: "" },
@@ -116,6 +117,26 @@ const AdvancedFilterBar = ({
   const searchInputRef = useRef(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
+  // Local search state — decoupled from URL params so keystrokes feel instant.
+  // The debounced value is what actually triggers onFilterChange → URL update → API call.
+  const [searchValue, setSearchValue] = useState(params.q ?? "");
+  const debouncedSearch = useDebounce(searchValue, 300);
+
+  // Sync debounced value → URL (fires API call)
+  useEffect(() => {
+    // Only fire if the debounced value actually differs from the current URL param
+    if (debouncedSearch !== (params.q ?? "")) {
+      onFilterChange("q", debouncedSearch);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
+  // Keep local state in sync when params.q changes externally (e.g. "Clear all")
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchValue(params.q ?? "");
+  }, [params.q]);
+
   // Count active advanced filters for the badge
   const advancedFilterCount = [
     params.cuisine,
@@ -163,8 +184,8 @@ const AdvancedFilterBar = ({
             />
             <input
               type="search"
-              value={params.q}
-              onChange={(e) => onFilterChange("q", e.target.value)}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search recipes…"
               aria-label="Search recipes"
               className={cn(
@@ -188,8 +209,8 @@ const AdvancedFilterBar = ({
                   <input
                     ref={searchInputRef}
                     type="search"
-                    value={params.q}
-                    onChange={(e) => onFilterChange("q", e.target.value)}
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
                     onBlur={handleSearchCollapse}
                     placeholder="Search…"
                     aria-label="Search recipes"
@@ -201,11 +222,11 @@ const AdvancedFilterBar = ({
                     )}
                   />
                 </div>
-                {params.q && (
+                {searchValue && (
                   <button
                     type="button"
                     onClick={() => {
-                      onFilterChange("q", "");
+                      setSearchValue("");
                       setSearchExpanded(false);
                     }}
                     className="size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
