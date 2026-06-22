@@ -64,6 +64,7 @@ export const POST = async (request) => {
       metadata: {
         userId: user.id,
         upgradeType: "premium",
+        priceAmount: String(price ?? 19.99),
       },
       success_url: successUrl,
       cancel_url: cancelUrl,

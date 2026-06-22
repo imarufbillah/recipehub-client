@@ -88,3 +88,8 @@ export const getPurchasesByUserId = (userId) =>
 
 export const updateUser = (userId, data) =>
   request("PATCH", `/users/${userId}`, data);
+
+// ─── Subscriptions ──────────────────────────────────────────────────────────────────
+
+export const createSubscription = (data) =>
+  request("POST", "/subscriptions", data);

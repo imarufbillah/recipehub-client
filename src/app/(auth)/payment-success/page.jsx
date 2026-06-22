@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { stripe } from "@/lib/stripe";
-import { makePurchase } from "@/lib/apiClient";
+import { makePurchase, createSubscription } from "@/lib/apiClient";
 import PaymentSuccessAnimated from "@/components/payment/PaymentSuccessAnimated";
 import { getServerSession } from "@/lib/session";
 
@@ -32,11 +32,11 @@ const PaymentSuccessPage = async ({ searchParams }) => {
   // No session ID → something went wrong
   if (!sessionId) redirect("/");
 
-  // Fetch real session from Stripe — expand line_items and payment_intent
+  // Fetch real session from Stripe — expand line_items, payment_intent, and subscription
   let session;
   try {
     session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["line_items", "payment_intent"],
+      expand: ["line_items", "payment_intent", "subscription"],
     });
   } catch {
     redirect("/");
@@ -45,27 +45,53 @@ const PaymentSuccessPage = async ({ searchParams }) => {
   // Only proceed for completed payments
   if (session.payment_status !== "paid") redirect("/");
 
-  // ── Record the purchase ─────────────────────────────────────────────────────
+  // ── Record purchase or subscription ────────────────────────────────────────
   const authSession = await getServerSession();
 
   if (authSession?.user) {
     const userId = authSession.user.id;
-    const recipeId = session.metadata?.recipeId;
+    const isPremiumCheckout = session.metadata?.upgradeType === "premium";
 
-    if (recipeId) {
-      await makePurchase({
+    if (isPremiumCheckout) {
+      const sub = session.subscription;
+      await createSubscription({
         userId,
-        recipeId,
-        stripeSessionId: session.id,
-        stripePaymentIntentId: session.payment_intent?.id ?? null,
-        amount: session.amount_total / 100,
-        currency: session.currency,
-        purchasedAt: new Date(
-          session.payment_intent?.created * 1000,
-        ).toISOString(),
+        stripeCustomerId: session.customer,
+        stripeSubscriptionId: sub?.id,
+        stripePriceId: sub?.items?.data?.[0]?.price?.id ?? null,
+        plan: "premium",
+        status: sub?.status ?? "active",
+        interval: "month",
+        amount: session.amount_total ?? 0,
+        currency: session.currency ?? "usd",
+        currentPeriodStart: sub?.current_period_start
+          ? new Date(sub.current_period_start * 1000).toISOString()
+          : null,
+        currentPeriodEnd: sub?.current_period_end
+          ? new Date(sub.current_period_end * 1000).toISOString()
+          : null,
+        cancelAtPeriodEnd: sub?.cancel_at_period_end ?? false,
       }).catch((err) => {
-        console.error("[makePurchase]", err.message);
+        console.error("[createSubscription]", err.message);
       });
+    } else {
+      // One-time purchase — record to purchases collection
+      const recipeId = session.metadata?.recipeId;
+      if (recipeId) {
+        await makePurchase({
+          userId,
+          recipeId,
+          stripeSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent?.id ?? null,
+          amount: session.amount_total / 100,
+          currency: session.currency,
+          purchasedAt: new Date(
+            session.payment_intent?.created * 1000,
+          ).toISOString(),
+        }).catch((err) => {
+          console.error("[makePurchase]", err.message);
+        });
+      }
     }
   }
 
@@ -78,12 +104,15 @@ const PaymentSuccessPage = async ({ searchParams }) => {
     fallbackTitle;
 
   const amountDisplay = formatAmount(session.amount_total, session.currency);
-  const txnRef = shortRef(session.payment_intent?.id);
+  // For subscriptions payment_intent is null — use the subscription ID as the ref
+  const txnRef = isPremiumUpgrade
+    ? `SUB-${session.subscription?.id?.slice(-6).toUpperCase() ?? "—"}`
+    : shortRef(session.payment_intent?.id);
   const customerEmail = session.customer_details?.email ?? null;
 
   const summaryLabel = isPremiumUpgrade ? "Premium Membership" : recipeTitle;
   const subText = isPremiumUpgrade
-    ? "Your Premium membership is now active. Enjoy full access to all premium recipes."
+    ? "Your Premium membership is now active. You can now publish unlimited recipes."
     : `You've unlocked "${recipeTitle}". Ingredients and instructions are now available.`;
   const ctaLabel = isPremiumUpgrade ? "Go to Dashboard" : "View Recipe";
 
