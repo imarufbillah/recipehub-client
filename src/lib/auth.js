@@ -25,6 +25,11 @@ export const auth = betterAuth({
         defaultValue: "user",
         input: false,
       },
+      bio: {
+        type: String,
+        defaultValue: "",
+        input: false,
+      },
       plan: {
         type: String,
         defaultValue: "free",

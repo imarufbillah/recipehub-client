@@ -1,12 +1,6 @@
 import { getServerSession } from "@/lib/session";
 import ProfileForm from "@/components/dashboard/ProfileForm";
 
-/**
- * Profile page — server component.
- *
- * Fetches the real session server-side and passes the user object down to
- * the ProfileForm client component which owns the interactive form state.
- */
 const ProfilePage = async () => {
   const { user } = await getServerSession();
 

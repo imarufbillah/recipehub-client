@@ -83,3 +83,8 @@ export const getPurchaseStatus = ({ userId, recipeId }) =>
   request("GET", `/purchases/status?userId=${userId}&recipeId=${recipeId}`);
 export const getPurchasesByUserId = (userId) =>
   request("GET", `/purchases/user/${userId}`);
+
+// ─── Users ──────────────────────────────────────────────────────────────────
+
+export const updateUser = (userId, data) =>
+  request("PATCH", `/users/${userId}`, data);
