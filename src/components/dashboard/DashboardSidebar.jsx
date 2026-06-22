@@ -15,32 +15,12 @@ import {
   ClipboardList,
   Flag,
   X,
+  Globe,
+  Utensils,
+  Crown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-
-/**
- * Dashboard Sidebar — client component.
- *
- * Desktop (lg+): persistent fixed sidebar, 240px wide.
- *   - Logo/wordmark at top (smaller than public navbar — 18px serif).
- *   - Role-aware nav list: icon + sans label, generous vertical padding per item.
- *   - Active state: 2px primary left-border accent on the active item — one
- *     clear signal, not both border AND background (design system restraint).
- *   - Inactive: muted-foreground → foreground on hover.
- *   - Bottom: user identity block, hairline border-top, avatar circle + name + role.
- *
- * Mobile (< lg): sidebar collapses fully. A hamburger trigger in the
- * DashboardHeader opens a slide-in overlay from the left (same sidebar width,
- * over a foreground-token scrim). Closes on outside-tap or X button.
- * No bounce — 250ms ease-out slide, 200ms ease-out close.
- *
- * Props:
- *  role      — "user" | "admin"
- *  user      — { name: string, email: string, avatarInitials: string }
- *  isOpen    — mobile overlay open state (controlled by DashboardHeader)
- *  onClose   — callback to close mobile overlay
- */
 
 const USER_NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -62,6 +42,14 @@ const ADMIN_NAV = [
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
 ];
 
+const QUICK_LINKS = [
+  { href: "/", label: "Home", icon: Globe },
+  { href: "/recipes", label: "Browse Recipes", icon: Utensils },
+  { href: "/premium", label: "Premium", icon: Crown },
+];
+
+// ─── Nav item ────────────────────────────────────────────────────────────────
+
 const NavItem = ({ href, label, icon: Icon, isActive }) => (
   <Link
     href={href}
@@ -75,7 +63,7 @@ const NavItem = ({ href, label, icon: Icon, isActive }) => (
     )}
     aria-current={isActive ? "page" : undefined}
   >
-    {/* Primary left-border accent — only on active, not combined with bg fill */}
+    {/* Primary left-border accent — only on active */}
     {isActive && (
       <span
         className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-full"
@@ -93,10 +81,29 @@ const NavItem = ({ href, label, icon: Icon, isActive }) => (
   </Link>
 );
 
+// ─── Quick link item — lighter style, no active state ────────────────────────
+
+const QuickLinkItem = ({ href, label, icon: Icon, onClick }) => (
+  <Link
+    href={href}
+    onClick={onClick}
+    className={cn(
+      "flex items-center gap-3 px-4 py-2 rounded-md",
+      "text-[12px] font-sans font-medium transition-colors duration-150",
+      "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    )}
+  >
+    <Icon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+    <span>{label}</span>
+  </Link>
+);
+
+// ─── Sidebar content (shared between desktop and mobile) ─────────────────────
+
 const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
   const navItems = role === "admin" ? ADMIN_NAV : USER_NAV;
 
-  // Derive initials from the real user.name field
   const initials = user?.name
     ? user.name
         .split(" ")
@@ -106,7 +113,6 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
         .toUpperCase()
     : "U";
 
-  // Special case: exact match for overview
   const isItemActive = (item) => {
     if (item.exact) return pathname === item.href;
     return pathname.startsWith(item.href);
@@ -147,17 +153,28 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
         ))}
       </nav>
 
+      {/* ── Quick links — public site shortcuts ── */}
+      <div className="px-3 pb-3 border-t border-sidebar-border pt-3">
+        <p className="px-4 pb-1.5 text-[10px] uppercase tracking-[0.08em] font-medium text-muted-foreground/60 font-sans">
+          Quick Links
+        </p>
+        <div className="flex flex-col gap-0.5">
+          {QUICK_LINKS.map((link) => (
+            <QuickLinkItem key={link.href} {...link} onClick={onLinkClick} />
+          ))}
+        </div>
+      </div>
+
       {/* ── User identity block ── */}
       <div className="px-4 py-4 border-t border-sidebar-border">
         <div className="flex items-center gap-3">
-          {/* Avatar — real image if available, else initials */}
           <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
             {user?.image ? (
               <Image
                 src={user.image}
                 alt={user.name ?? "avatar"}
-                width={400}
-                height={400}
+                width={32}
+                height={32}
                 className="size-full object-cover"
               />
             ) : (
@@ -185,22 +202,23 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
   );
 };
 
+// ─── Sidebar shell ────────────────────────────────────────────────────────────
+
 const DashboardSidebar = ({ role = "user", user, isOpen, onClose }) => {
   const pathname = usePathname();
 
-  // Close on Escape
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Escape") onClose?.();
     },
     [onClose],
   );
+
   useEffect(() => {
     if (isOpen) window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, handleKeyDown]);
 
-  // Body scroll lock on mobile
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
@@ -227,7 +245,6 @@ const DashboardSidebar = ({ role = "user", user, isOpen, onClose }) => {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Scrim */}
             <motion.div
               key="scrim"
               initial={{ opacity: 0 }}
@@ -242,7 +259,6 @@ const DashboardSidebar = ({ role = "user", user, isOpen, onClose }) => {
               aria-hidden
             />
 
-            {/* Slide-in panel */}
             <motion.aside
               key="panel"
               initial={{ x: "-100%" }}
@@ -252,7 +268,6 @@ const DashboardSidebar = ({ role = "user", user, isOpen, onClose }) => {
               className="fixed top-0 left-0 bottom-0 z-50 w-64 bg-sidebar border-r border-sidebar-border lg:hidden flex flex-col"
               aria-label="Sidebar"
             >
-              {/* Close button */}
               <button
                 type="button"
                 onClick={onClose}
