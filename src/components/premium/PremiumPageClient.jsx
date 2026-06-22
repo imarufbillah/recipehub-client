@@ -16,7 +16,7 @@ const fadeUp = {
   }),
 };
 
-const PremiumPageClient = ({ isPremium = false, price = "20" }) => {
+const PremiumPageClient = ({ isPremium = false, price = "19.99" }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckout = async () => {

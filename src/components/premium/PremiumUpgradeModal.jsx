@@ -48,7 +48,7 @@ const PremiumUpgradeModal = ({
   isOpen,
   onClose,
   variant = "upgrade",
-  price = "20",
+  price = "19.99",
   onCheckout,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
