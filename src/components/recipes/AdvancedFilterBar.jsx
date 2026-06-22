@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Search, X, ChevronDown, SlidersHorizontal, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DIFFICULTIES, SORT_OPTIONS } from "@/app/(public)/recipes/page";
+import { DIFFICULTIES, SORT_OPTIONS } from "@/lib/recipeConstants";
 import useDebounce from "@/hooks/useDebounce";
 
 const PREP_TIME_OPTIONS = [

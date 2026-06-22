@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/session";
-import { getPurchasesByUserId } from "@/lib/apiClient";
+import { getPurchasesByUserId } from "@/lib/apiClient.server";
 import PurchasedTable from "@/components/dashboard/PurchasedTable";
 
 const formatDate = (iso) => {

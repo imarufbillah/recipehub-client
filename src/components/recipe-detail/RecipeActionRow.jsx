@@ -11,7 +11,7 @@ import {
   unlikeRecipe,
   addToFavorites,
   removeFromFavorites,
-} from "@/lib/apiClient";
+} from "@/lib/apiClient.client";
 import handleCheckout from "@/lib/handleCheckout";
 
 const IconPulse = ({ children, trigger }) => (

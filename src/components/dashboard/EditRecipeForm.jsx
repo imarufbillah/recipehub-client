@@ -26,24 +26,8 @@ import {
   CATEGORIES,
   DIFFICULTIES,
 } from "@/components/dashboard/recipeFormParts";
-import { updateRecipe } from "@/lib/apiClient";
+import { updateRecipe } from "@/lib/apiClient.client";
 
-/**
- * EditRecipeForm — pre-populated edit variant of the recipe form.
- *
- * Differences from RecipeForm (add):
- *  1. EditImageDropZone replaces ImageDropZone — shows existing image with
- *     a hover-triggered Replace affordance instead of the empty dashed state.
- *  2. "Unsaved changes" indicator — appears inline near Save once any field
- *     has been modified from its initial value.
- *  3. Footer: Cancel (ghost) + Save Changes (primary) — right-aligned pair.
- *  4. Calls updateRecipe(id, payload) instead of createRecipe.
- *  5. Does NOT reset on success — navigates to My Recipes instead.
- *
- * Props:
- *  recipe  — full recipe object from the server (API shape)
- *  user    — current session user
- */
 const EditRecipeForm = ({ recipe, user }) => {
   // ── Form state seeded from existing recipe ──────────────────────────────────
   const [recipeName, setName] = useState(recipe.recipeName ?? "");

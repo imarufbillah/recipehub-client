@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerSession } from "@/lib/session";
-import { getRecipesByUserId } from "@/lib/apiClient";
+import { getRecipesByUserId } from "@/lib/apiClient.server";
 import EditRecipeForm from "@/components/dashboard/EditRecipeForm";
 import { Button } from "@/components/ui/button";
 
@@ -9,10 +9,6 @@ const EditRecipePage = async ({ params }) => {
   const { id } = await params;
   const { user } = await getServerSession();
 
-  // Fetch this user's recipes and find the one matching the id param.
-  // TODO: replace with a direct getRecipeById(id) call once that endpoint
-  // is added to apiClient — fetching all recipes just to find one is fine
-  // for now but wasteful at scale.
   let recipe = null;
   try {
     const data = await getRecipesByUserId(user.id);

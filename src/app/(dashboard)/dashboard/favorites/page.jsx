@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/session";
-import { getFavoritesByUserId } from "@/lib/apiClient";
+import { getFavoritesByUserId } from "@/lib/apiClient.server";
 import FavoritesTable from "@/components/dashboard/FavoritesTable";
 
 const formatDate = (iso) => {

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import FormField from "@/components/ui/FormField";
-import { updateUser } from "@/lib/apiClient";
+import { updateUser } from "@/lib/apiClient.client";
 import uploadToImgbb from "@/lib/uploadToImgbb";
 
 const ProfileForm = ({ user }) => {

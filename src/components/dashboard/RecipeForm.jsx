@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import uploadToImgbb from "@/lib/uploadToImgbb";
-import { createRecipe } from "@/lib/apiClient";
+import { createRecipe } from "@/lib/apiClient.client";
 import {
   Field,
   ImageDropZone,

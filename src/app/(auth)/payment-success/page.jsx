@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { stripe } from "@/lib/stripe";
-import { makePurchase, createSubscription } from "@/lib/apiClient";
+import { makePurchase, createSubscription } from "@/lib/apiClient.server";
 import PaymentSuccessAnimated from "@/components/payment/PaymentSuccessAnimated";
 import { getServerSession } from "@/lib/session";
 

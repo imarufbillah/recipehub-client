@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/session";
-import { getRecipesByUserId } from "@/lib/apiClient";
+import { getRecipesByUserId } from "@/lib/apiClient.server";
 import MyRecipesTable from "@/components/dashboard/MyRecipesTable";
 
 const MyRecipesPage = async () => {

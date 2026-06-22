@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BookmarkX } from "lucide-react";
 import { toast } from "sonner";
 import DashboardTable from "@/components/dashboard/DashboardTable";
-import { removeFromFavorites } from "@/lib/apiClient";
+import { removeFromFavorites } from "@/lib/apiClient.client";
 
 const COLUMNS = [
   {

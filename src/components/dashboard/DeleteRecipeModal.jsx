@@ -10,31 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { deleteRecipe } from "@/lib/apiClient";
+import { deleteRecipe } from "@/lib/apiClient.client";
 
-/**
- * DeleteRecipeModal — destructive confirmation dialog.
- *
- * Design system notes:
- *  - DialogContent handles: portal, scrim (foreground at low opacity via
- *    the overlay), focus-trap, Escape-to-close, fade + upward translate
- *    entry animation — all from the shared Dialog primitive.
- *  - No close button (showCloseButton={false}) — the Cancel button IS the
- *    close affordance; an X in the corner on a destructive confirmation
- *    adds ambiguity about which action it performs.
- *  - Destructive button: the ONE place a solid destructive-fill button is
- *    appropriate — the color weight correctly signals irreversibility.
- *  - Single small Trash2 line-icon at top — not an illustration, not large.
- *    Left-aligned with the heading, reads as a type-level marker not decoration.
- *
- * Props:
- *  open        — boolean controlling Dialog open state
- *  onClose     — called when the dialog should close (cancel or after delete)
- *  recipeName  — shown in the supporting copy to name the specific record
- *  recipeId    — passed to the delete API call
- *  onDeleted   — optional callback fired after a successful delete (e.g. to
- *                remove the row from local state without a full page refresh)
- */
 const DeleteRecipeModal = ({
   open,
   onClose,

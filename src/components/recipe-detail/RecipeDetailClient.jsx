@@ -4,7 +4,7 @@ import { useState } from "react";
 import RecipeActionRow from "./RecipeActionRow";
 import ReportModal from "./ReportModal";
 import { useClientSession } from "@/hooks/useClientSession";
-import { createReport } from "@/lib/apiClient";
+import { createReport } from "@/lib/apiClient.client";
 
 const RecipeDetailClient = ({
   recipeId,

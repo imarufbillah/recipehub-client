@@ -10,7 +10,7 @@ import {
   getFavoriteStatus,
   getReportStatus,
   getPurchaseStatus,
-} from "@/lib/apiClient";
+} from "@/lib/apiClient.server";
 import { auth } from "@/lib/auth";
 
 const normaliseRecipe = (r) => ({

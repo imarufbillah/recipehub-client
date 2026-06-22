@@ -1,27 +1,28 @@
-import { authClient } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// ─── Auth token ───────────────────────────────────────────────────────────────
+// ─── Auth token (server-side) ─────────────────────────────────────────────────
 
 const getToken = async () => {
-  const { data, error } = await authClient.token();
-  if (error || !data) return null;
-  return data.token;
+  const reqHeaders = await headers();
+  const response = await auth.api.getToken({ headers: reqHeaders });
+  return response?.token ?? null;
 };
 
 // ─── Core request helper ──────────────────────────────────────────────────────
 
 const request = async (method, path, body) => {
-  // const token = await getToken();
+  const token = await getToken();
 
-  // const headers = { Authorization: `Bearer ${token}` };
-  const headers = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  const reqHeaders = { Authorization: `Bearer ${token}` };
+
+  if (body !== undefined) reqHeaders["Content-Type"] = "application/json";
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers,
+    headers: reqHeaders,
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 
@@ -30,7 +31,6 @@ const request = async (method, path, body) => {
     throw new Error(error.message || `Request failed: ${method} ${path}`);
   }
 
-  // 204 No Content — nothing to parse
   if (res.status === 204) return null;
 
   return res.json();
@@ -38,13 +38,8 @@ const request = async (method, path, body) => {
 
 // ─── Recipes ──────────────────────────────────────────────────────────────────
 
-export const createRecipe = (data) => request("POST", "/recipes", data);
 export const getRecipesByUserId = (userId) =>
   request("GET", `/recipes/user/${userId}`);
-export const updateRecipe = (recipeId, data) =>
-  request("PATCH", `/recipes/${recipeId}`, data);
-export const deleteRecipe = (recipeId) =>
-  request("DELETE", `/recipes/${recipeId}`);
 export const getAllRecipes = (params = {}) => {
   const qs = new URLSearchParams();
   const allowed = [
@@ -75,27 +70,22 @@ export const getAllRecipes = (params = {}) => {
 };
 export const getRecipeById = (id) => request("GET", `/recipes/${id}`);
 
-// ─── Categories ──────────────────────────────────────────────────────────────────
+// ─── Categories ───────────────────────────────────────────────────────────────
 
 export const getAllRecipeCategories = () =>
   request("GET", "/recipes/categories");
 
-// ─── Cuisines ──────────────────────────────────────────────────────────────────
+// ─── Cuisines ─────────────────────────────────────────────────────────────────
 
 export const getAllRecipeCuisines = () => request("GET", "/recipes/cuisines");
 
-// ─── Likes ──────────────────────────────────────────────────────────────────
+// ─── Likes ────────────────────────────────────────────────────────────────────
 
-export const likeRecipe = (data) => request("POST", "/likes", data);
-export const unlikeRecipe = (data) => request("DELETE", "/likes", data);
 export const getLikeStatus = ({ userId, recipeId }) =>
   request("GET", `/likes/status?userId=${userId}&recipeId=${recipeId}`);
 
-// ─── Favorites ──────────────────────────────────────────────────────────────────
+// ─── Favorites ────────────────────────────────────────────────────────────────
 
-export const addToFavorites = (data) => request("POST", "/favorites", data);
-export const removeFromFavorites = (data) =>
-  request("DELETE", "/favorites", data);
 export const getFavoriteStatus = ({ userId, recipeId }) =>
   request("GET", `/favorites/status?userId=${userId}&recipeId=${recipeId}`);
 export const getFavoritesByUserId = (userId) =>
@@ -103,7 +93,6 @@ export const getFavoritesByUserId = (userId) =>
 
 // ─── Reports ──────────────────────────────────────────────────────────────────
 
-export const createReport = (data) => request("POST", "/reports", data);
 export const getReportStatus = ({ userId, recipeId }) =>
   request("GET", `/reports/status?userId=${userId}&recipeId=${recipeId}`);
 
@@ -115,12 +104,7 @@ export const getPurchaseStatus = ({ userId, recipeId }) =>
 export const getPurchasesByUserId = (userId) =>
   request("GET", `/purchases/user/${userId}`);
 
-// ─── Users ──────────────────────────────────────────────────────────────────
-
-export const updateUser = (userId, data) =>
-  request("PATCH", `/users/${userId}`, data);
-
-// ─── Subscriptions ──────────────────────────────────────────────────────────────────
+// ─── Subscriptions ────────────────────────────────────────────────────────────
 
 export const createSubscription = (data) =>
   request("POST", "/subscriptions", data);
