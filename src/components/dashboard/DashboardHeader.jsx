@@ -1,33 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { Menu } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Menu, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import ThemeToggle from "@/components/navbar/ThemeToggle";
 import DashboardSidebar from "./DashboardSidebar";
+import DashboardUserDropdown from "./DashboardUserDropdown";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 
-/**
- * Dashboard Header — client component.
- *
- * Persistent top bar across all dashboard pages.
- * Per Admin Mode rules: page title in sans (not serif) — dashboard chrome
- * prioritises fast scanning, not editorial personality. Serif is reserved
- * for true content (recipe names, section titles).
- *
- * Layout:
- *  Left:  hamburger (mobile only) + current page title
- *  Right: theme toggle + user avatar menu trigger
- *
- * Hairline border-bottom separates header from content area.
- *
- * Props:
- *  title    — current page title string (passed from each page)
- *  role     — "user" | "admin" (passed to DashboardSidebar)
- *  user     — user identity object { name, avatarInitials }
- */
 const DashboardHeader = ({ title, role = "user", user }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const initials = user?.name
     ? user.name
@@ -38,9 +23,30 @@ const DashboardHeader = ({ title, role = "user", user }) => {
         .toUpperCase()
     : "U";
 
+  // Close on click-outside
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [menuOpen]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [menuOpen]);
+
   return (
     <>
-      {/* Sidebar — controlled from here so mobile hamburger and close are co-located */}
       <DashboardSidebar
         role={role}
         user={user}
@@ -48,11 +54,9 @@ const DashboardHeader = ({ title, role = "user", user }) => {
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Header bar */}
       <header className="sticky top-0 z-20 flex items-center justify-between h-14 px-5 md:px-8 bg-background border-b border-border">
         {/* ── Left: mobile hamburger + page title ── */}
         <div className="flex items-center gap-3">
-          {/* Hamburger — mobile only, opens sidebar overlay */}
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -66,7 +70,6 @@ const DashboardHeader = ({ title, role = "user", user }) => {
             <Menu className="size-4.5" />
           </button>
 
-          {/* Page title — sans, Admin Mode density, not serif */}
           <h1
             className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]"
             style={{ fontFamily: "var(--font-sans)" }}
@@ -75,33 +78,80 @@ const DashboardHeader = ({ title, role = "user", user }) => {
           </h1>
         </div>
 
-        {/* ── Right: theme toggle + avatar ── */}
+        {/* ── Right: theme toggle + avatar trigger ── */}
         <div className="flex items-center gap-1">
           <ThemeToggle />
 
-          {/* Avatar chip — real image or initials, acts as menu trigger placeholder */}
-          <button
-            type="button"
-            aria-label="User menu"
-            className={cn(
-              "ml-1 size-8 rounded-full bg-muted flex items-center justify-center overflow-hidden",
-              "text-[11px] font-sans font-semibold text-muted-foreground uppercase tracking-[0.04em]",
-              "hover:opacity-80 transition-opacity duration-150",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            )}
-          >
-            {user?.image ? (
-              <Image
-                src={user.image}
-                alt={user.name ?? "avatar"}
-                width={400}
-                height={400}
-                className="size-full object-cover"
+          {/* Avatar trigger — avatar + first name + rotating chevron */}
+          <div ref={menuRef} className="relative ml-1">
+            <button
+              type="button"
+              aria-label="User menu"
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className={cn(
+                "flex items-center gap-2 rounded-full outline-none",
+                "transition-opacity duration-200 hover:opacity-80",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              )}
+            >
+              {/* Avatar circle */}
+              <span
+                className={cn(
+                  "relative flex shrink-0 size-8 rounded-full overflow-hidden bg-muted",
+                  user?.plan === "premium" &&
+                    "ring-2 ring-accent ring-offset-1 ring-offset-background",
+                )}
+              >
+                {user?.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name ?? "avatar"}
+                    fill
+                    sizes="32px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="flex size-full items-center justify-center text-[11px] font-sans font-semibold text-muted-foreground uppercase tracking-[0.04em] select-none">
+                    {initials}
+                  </span>
+                )}
+              </span>
+
+              {/* First name — hidden on very small screens */}
+              <span className="hidden sm:block text-[13px] font-sans text-foreground leading-none select-none">
+                {user?.name?.split(" ")[0] ?? ""}
+              </span>
+
+              {/* Chevron — rotates 180° when open */}
+              <ChevronDown
+                className={cn(
+                  "size-3.5 text-muted-foreground transition-transform duration-200",
+                  menuOpen && "rotate-180",
+                )}
+                aria-hidden
               />
-            ) : (
-              initials
-            )}
-          </button>
+            </button>
+
+            {/* Dropdown with entrance animation matching the navbar */}
+            <AnimatePresence>
+              {menuOpen && (
+                <motion.div
+                  className="absolute top-full right-0 mt-2 z-50"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.175, ease: "easeOut" }}
+                >
+                  <DashboardUserDropdown
+                    user={user}
+                    onClose={() => setMenuOpen(false)}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </header>
     </>
