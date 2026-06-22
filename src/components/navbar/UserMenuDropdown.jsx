@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   User,
-  Heart,
+  Bookmark,
   ShoppingBag,
   LogOut,
   ShieldCheck,
@@ -11,20 +11,6 @@ import {
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-
-/**
- * UserMenuDropdown — the popover panel anchored below-right of the trigger.
- *
- * Structure (top → bottom):
- *  1. Identity header (non-interactive): avatar, full name, email
- *  2. Navigation items: Dashboard, Profile, Favorites, Purchased Recipes
- *  3. Conditional admin row: "Admin Dashboard" (accent icon, only when role === "admin")
- *  4. Hairline divider
- *  5. Logout — destructive-token text + icon
- *
- * Elevation: card token background, hairline border, soft low-opacity shadow.
- * Hover: secondary-token background tint on rows, no primary fill — utility not CTA.
- */
 
 const menuItems = [
   {
@@ -40,7 +26,7 @@ const menuItems = [
   {
     href: "/dashboard/favorites",
     label: "Favorites",
-    icon: Heart,
+    icon: Bookmark,
   },
   {
     href: "/dashboard/purchased",
@@ -111,8 +97,8 @@ const UserMenuDropdown = ({ user, onClose }) => {
               <Image
                 src={user.image}
                 alt={user.name ?? "User avatar"}
-                fill
-                sizes="40px"
+                width={400}
+                height={400}
                 className="rounded-full object-cover"
               />
             ) : (
