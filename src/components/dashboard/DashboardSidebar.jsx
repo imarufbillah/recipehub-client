@@ -159,7 +159,9 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
           Quick Links
         </p>
         <div className="flex flex-col gap-0.5">
-          {QUICK_LINKS.map((link) => (
+          {QUICK_LINKS.filter(
+            (link) => !(link.href === "/premium" && user?.plan === "premium"),
+          ).map((link) => (
             <QuickLinkItem key={link.href} {...link} onClick={onLinkClick} />
           ))}
         </div>
