@@ -24,7 +24,7 @@ const QUOTES = [
 
 const PremiumSocialProof = () => {
   return (
-    <div className="w-full max-w-135 mx-auto">
+    <div className="w-full">
       {/* Horizontal strip — flex row with hairline separators between items */}
       <div className="flex items-stretch divide-x divide-border">
         {QUOTES.map(({ quote, name, avatar }, i) => (

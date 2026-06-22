@@ -15,7 +15,7 @@ const PremiumAlreadyMember = () => {
   return (
     <div
       className={cn(
-        "w-full max-w-135 mx-auto",
+        "w-full",
         "bg-card border border-border rounded-xl",
         "px-10 py-14 flex flex-col items-center gap-0",
         "max-sm:px-6 max-sm:py-10",

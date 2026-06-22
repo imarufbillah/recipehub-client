@@ -7,26 +7,13 @@ import PremiumOfferCard from "./PremiumOfferCard";
 import PremiumAlreadyMember from "./PremiumAlreadyMember";
 import PremiumSocialProof from "./PremiumSocialProof";
 
-const cardEntrance = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-};
-
-/**
- * Header fades in first, slightly ahead of the card.
- * Keeps the page from feeling like everything pops at once.
- */
-const headerEntrance = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: "easeOut", delay: 0 },
-  },
+    transition: { duration: 0.45, ease: "easeOut", delay },
+  }),
 };
 
 const PremiumPageClient = ({ isPremium = false, price = "20" }) => {
@@ -56,23 +43,47 @@ const PremiumPageClient = ({ isPremium = false, price = "20" }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-16 w-full">
-      {/* ── Page header block — breathing room before the offer ── */}
+    /*
+     * Two-column grid on lg+.
+     * 7/12 left, 5/12 right — deliberate asymmetry per design system
+     * ("asymmetry permitted in hero/featured layouts").
+     * gap-16 gives generous breathing room between columns.
+     * Single column on mobile (grid-cols-1).
+     */
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start w-full">
+      {/* ── Left column — text content ── */}
       <motion.div
-        variants={headerEntrance}
+        variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="w-full flex justify-center"
+        custom={0}
+        className="lg:col-span-7 flex flex-col gap-12"
       >
         <PremiumPageHeader />
+
+        {/* Social proof strip — lives in the left column below the header copy */}
+        {!isPremium && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
+          >
+            <PremiumSocialProof />
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* ── Offer card — single focal element, quiet entrance ── */}
+      {/* ── Right column — offer card, sticky on scroll ── */}
       <motion.div
-        variants={cardEntrance}
+        variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="w-full flex justify-center"
+        custom={0.1}
+        /*
+         * lg:sticky + top accounts for the fixed navbar (h-16 = 64px) plus
+         * comfortable breathing room so the card doesn't kiss the nav edge.
+         */
+        className="lg:col-span-5 lg:sticky lg:top-24"
       >
         {isPremium ? (
           <PremiumAlreadyMember />
@@ -84,18 +95,6 @@ const PremiumPageClient = ({ isPremium = false, price = "20" }) => {
           />
         )}
       </motion.div>
-
-      {/* ── Social proof strip — low emphasis, below the fold decision point ── */}
-      {!isPremium && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.35 }}
-          className="w-full flex justify-center pb-4"
-        >
-          <PremiumSocialProof />
-        </motion.div>
-      )}
     </div>
   );
 };
