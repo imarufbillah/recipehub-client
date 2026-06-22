@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/recipes", label: "Browse Recipes" },
+  { href: "/premium", label: "Premium" },
 ];
 
 const userMenuLinks = [
@@ -35,24 +36,6 @@ const userMenuLinks = [
   },
 ];
 
-/**
- * MobileMenu — hamburger trigger + full-screen overlay.
- *
- * Authenticated state:
- *  - Overlay top bar shows identity header (avatar + name + email) instead of logo
- *  - Nav links stagger in as before
- *  - User menu links appended below a hairline, as full-width sans links
- *  - Admin Dashboard row conditionally inserted (accent-tinted icon)
- *  - Logout last, destructive-token tint
- *  - No nested popover — all flattened into the single overlay
- *
- * Unauthenticated state: unchanged (logo top bar, Login + Register at bottom).
- *
- * Motion spec (Design System):
- *  - Overlay: opacity 0→1, 250ms ease-out
- *  - Links: stagger fade-up 12px, 60ms apart, 180ms start delay
- *  - Close: opacity 1→0, 200ms ease-out
- */
 const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);

@@ -4,23 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-/**
- * User overview — 4 stat cards at user density (dense=false).
- *
- * Cards: Total Recipes · Total Favorites · Total Likes Received · Premium Status
- *
- * Premium Status card has two distinct visual treatments:
- *  - Is premium: quiet accent-tinted "Premium" badge inside the card slot.
- *  - Not premium: ghost "Upgrade" CTA linking to a purchase page.
- *
- * Props:
- *  stats — {
- *    totalRecipes: number,
- *    totalFavorites: number,
- *    totalLikes: number,
- *    isPremium: boolean,
- *  }
- */
 const UserOverview = ({
   stats = {
     totalRecipes: 12,
@@ -74,7 +57,7 @@ const UserOverview = ({
             asChild
             className="px-0 text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground hover:text-primary hover:bg-transparent"
           >
-            <Link href="/dashboard/upgrade">Upgrade to Premium →</Link>
+            <Link href="/premium">Upgrade to Premium →</Link>
           </Button>
         )}
       </StatCard>

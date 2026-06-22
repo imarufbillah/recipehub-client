@@ -4,13 +4,9 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/", label: "Home" },
   { href: "/recipes", label: "Browse Recipes" },
+  { href: "/premium", label: "Premium" },
 ];
 
-/**
- * Desktop nav links — sans micro-label style, uppercase, tight tracking.
- * Accepts an optional `pathname` prop to highlight the active link.
- * Server component — no interactivity needed here.
- */
 const NavLinks = ({ pathname = "" }) => {
   return (
     <nav aria-label="Main navigation">
@@ -23,7 +19,6 @@ const NavLinks = ({ pathname = "" }) => {
               <Link
                 href={href}
                 className={cn(
-                  // Micro-label: 11–12px, uppercase, +0.08em tracking, sans
                   "text-[11px] font-medium uppercase tracking-[0.08em] transition-colors duration-200",
                   isActive
                     ? "text-primary"
