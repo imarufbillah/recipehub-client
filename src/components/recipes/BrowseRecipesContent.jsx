@@ -22,13 +22,20 @@ const BrowseRecipesContent = ({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  // Merge a partial update into the current URL params and navigate
+  // Merge a partial update into the current URL params and navigate.
+  // Arrays are joined as comma-separated strings for the URL.
   const pushParams = useCallback(
     (updates) => {
       const params = new URLSearchParams(searchParams.toString());
 
       for (const [key, value] of Object.entries(updates)) {
-        if (value !== "" && value !== null && value !== undefined) {
+        if (Array.isArray(value)) {
+          if (value.length > 0) {
+            params.set(key, value.join(","));
+          } else {
+            params.delete(key);
+          }
+        } else if (value !== "" && value !== null && value !== undefined) {
           params.set(key, String(value));
         } else {
           params.delete(key);

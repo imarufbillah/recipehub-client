@@ -64,7 +64,8 @@ const RecipesPage = async ({ searchParams }) => {
     !!p?.category ||
     !!p?.cuisine ||
     !!p?.difficulty ||
-    !!p?.isPremium;
+    !!p?.isPremium ||
+    !!p?.maxPrepTime;
 
   return (
     <>

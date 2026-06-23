@@ -14,12 +14,30 @@ const PREP_TIME_OPTIONS = [
   { label: "≤ 60 min", value: "60" },
 ];
 
-// Reusable horizontal chip group
-const ChipGroup = ({
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Parse a URL param that may be a comma-separated string into an array.
+// "" or undefined → []
+const parseMulti = (val) =>
+  val
+    ? val
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean)
+    : [];
+
+// Toggle a value in/out of an array. Returns the new array.
+const toggleInArray = (arr, val) =>
+  arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
+
+// ─── Multi-select chip group ──────────────────────────────────────────────────
+
+const MultiChipGroup = ({
   options,
-  activeValue,
-  onSelect,
+  activeValues = [], // string[]
+  onSelect, // (newValues: string[]) => void
   accentActive = false,
+  hasAllOption = true, // prepend an "All" chip that clears selection
 }) => {
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -44,6 +62,8 @@ const ChipGroup = ({
       ro.disconnect();
     };
   }, [updateFades]);
+
+  const isAllActive = activeValues.length === 0;
 
   return (
     <div className="relative flex-1 min-w-0">
@@ -72,15 +92,36 @@ const ChipGroup = ({
         className="flex items-center gap-1.5 overflow-x-auto scrollbar-none scroll-smooth"
         style={{ scrollbarWidth: "none" }}
       >
+        {/* "All" chip — clears selection */}
+        {hasAllOption && (
+          <button
+            key="all"
+            type="button"
+            onClick={() => onSelect([])}
+            className={cn(
+              "shrink-0 inline-flex items-center px-3 py-1.5 rounded-full",
+              "text-[11px] uppercase tracking-[0.08em] font-medium font-sans",
+              "transition-colors duration-200 whitespace-nowrap",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              isAllActive
+                ? accentActive
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+            )}
+            aria-pressed={isAllActive}
+          >
+            All
+          </button>
+        )}
+
         {options.map(({ id, label }) => {
-          const isActive = activeValue === id;
+          const isActive = activeValues.includes(id);
           return (
             <button
-              key={id ?? "all"}
+              key={id}
               type="button"
-              onClick={() =>
-                onSelect(isActive ? (id === null ? null : "") : id)
-              }
+              onClick={() => onSelect(toggleInArray(activeValues, id))}
               className={cn(
                 "shrink-0 inline-flex items-center px-3 py-1.5 rounded-full",
                 "text-[11px] uppercase tracking-[0.08em] font-medium font-sans",
@@ -117,38 +158,34 @@ const AdvancedFilterBar = ({
   const searchInputRef = useRef(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
-  // Local search state — decoupled from URL params so keystrokes feel instant.
-  // The debounced value is what actually triggers onFilterChange → URL update → API call.
+  // Local search state — debounced before hitting URL/API
   const [searchValue, setSearchValue] = useState(params.q ?? "");
   const debouncedSearch = useDebounce(searchValue, 300);
 
-  // Sync debounced value → URL (fires API call)
   useEffect(() => {
-    // Only fire if the debounced value actually differs from the current URL param
     if (debouncedSearch !== (params.q ?? "")) {
       onFilterChange("q", debouncedSearch);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
-  // Keep local state in sync when params.q changes externally (e.g. "Clear all")
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchValue(params.q ?? "");
   }, [params.q]);
 
+  // Parse multi-value URL params back to arrays
+  const selectedCategories = parseMulti(params.category);
+  const selectedCuisines = parseMulti(params.cuisine);
+
   // Count active advanced filters for the badge
   const advancedFilterCount = [
-    params.cuisine,
+    selectedCuisines.length > 0 ? "cuisine" : null,
     params.difficulty,
     params.maxPrepTime,
     params.isPremium,
   ].filter(Boolean).length;
 
-  const allCategories = [{ id: null, label: "All" }, ...categories];
-
-  // Cuisines come from the API — prepend an "All" option
-  const cuisineOptions = [{ id: "", label: "All" }, ...cuisines];
   const difficultyOptions = [
     { id: "", label: "Any" },
     ...DIFFICULTIES.map((d) => ({ id: d, label: d })),
@@ -167,13 +204,11 @@ const AdvancedFilterBar = ({
       <div className="mx-auto max-w-360 px-6 md:px-10 lg:px-16">
         {/* ── Row 1: category chips + search + filters button + sort ── */}
         <div className="flex items-center gap-3 py-3">
-          {/* Category chips */}
-          <ChipGroup
-            options={allCategories}
-            activeValue={params.category ? params.category.toLowerCase() : null}
-            onSelect={(val) =>
-              onFilterChange("category", val === null ? "" : val)
-            }
+          {/* Category chips — multi-select */}
+          <MultiChipGroup
+            options={categories}
+            activeValues={selectedCategories}
+            onSelect={(vals) => onFilterChange("category", vals)}
           />
 
           {/* Desktop search */}
@@ -314,19 +349,19 @@ const AdvancedFilterBar = ({
         {/* ── Row 2: advanced filter drawer ── */}
         {drawerOpen && (
           <div className="flex flex-col gap-3 pb-3 border-t border-border pt-3">
-            {/* Cuisine row */}
+            {/* Cuisine row — multi-select */}
             <div className="flex items-center gap-3">
               <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans shrink-0 w-16">
                 Cuisine
               </span>
-              <ChipGroup
-                options={cuisineOptions}
-                activeValue={params.cuisine ?? ""}
-                onSelect={(val) => onFilterChange("cuisine", val)}
+              <MultiChipGroup
+                options={cuisines}
+                activeValues={selectedCuisines}
+                onSelect={(vals) => onFilterChange("cuisine", vals)}
               />
             </div>
 
-            {/* Difficulty row */}
+            {/* Difficulty row — single-select */}
             <div className="flex items-center gap-3">
               <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans shrink-0 w-16">
                 Difficulty
@@ -364,7 +399,7 @@ const AdvancedFilterBar = ({
 
             {/* Prep time + Premium row */}
             <div className="flex items-center gap-6 flex-wrap">
-              {/* Prep time */}
+              {/* Prep time — single-select */}
               <div className="flex items-center gap-3">
                 <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans shrink-0 w-16">
                   Prep Time
@@ -397,7 +432,7 @@ const AdvancedFilterBar = ({
                 </div>
               </div>
 
-              {/* Premium toggle — accent when active */}
+              {/* Premium toggle */}
               <div className="flex items-center gap-3">
                 <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans shrink-0 w-16">
                   Plan

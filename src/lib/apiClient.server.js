@@ -57,13 +57,9 @@ export const getAllRecipes = (params = {}) => {
     "limit",
   ];
   for (const key of allowed) {
-    if (
-      params[key] !== undefined &&
-      params[key] !== null &&
-      params[key] !== ""
-    ) {
-      qs.set(key, String(params[key]));
-    }
+    const value = params[key];
+    if (value === undefined || value === null || value === "") continue;
+    qs.set(key, Array.isArray(value) ? value.join(",") : String(value));
   }
   const query = qs.toString();
   return request("GET", `/recipes${query ? `?${query}` : ""}`);
