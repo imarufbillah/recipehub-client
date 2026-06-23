@@ -5,6 +5,7 @@ import RecipeActionRow from "./RecipeActionRow";
 import ReportModal from "./ReportModal";
 import { useClientSession } from "@/hooks/useClientSession";
 import { createReport } from "@/lib/apiClient.client";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 const RecipeDetailClient = ({
   recipeId,
@@ -23,8 +24,9 @@ const RecipeDetailClient = ({
   const [hasReported, setHasReported] = useState(initialReported);
   const { user } = useClientSession();
   const userId = user?.id ?? null;
+  const guard = useAuthGuard();
 
-  const handleReport = () => setReportOpen(true);
+  const handleReport = () => guard(() => setReportOpen(true));
   const handleCloseReport = () => setReportOpen(false);
 
   const handleSubmitReport = async (reason, additionalContext) => {

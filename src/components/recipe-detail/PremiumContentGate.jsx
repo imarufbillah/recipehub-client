@@ -5,6 +5,7 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import handleCheckout from "@/lib/handleCheckout";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 const PremiumContentGate = ({
   recipeName,
@@ -14,20 +15,22 @@ const PremiumContentGate = ({
   price,
 }) => {
   const [loading, setLoading] = useState(false);
+  const guard = useAuthGuard();
 
-  const handleUnlock = async () => {
-    setLoading(true);
-    try {
-      await handleCheckout({
-        recipeId,
-        recipeName,
-        price: priceAmount,
-        recipeSlug,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleUnlock = () =>
+    guard(async () => {
+      setLoading(true);
+      try {
+        await handleCheckout({
+          recipeId,
+          recipeName,
+          price: priceAmount,
+          recipeSlug,
+        });
+      } finally {
+        setLoading(false);
+      }
+    });
 
   return (
     <section className="relative mx-auto max-w-360 px-6 md:px-10 lg:px-16 py-16 lg:py-24 overflow-hidden">

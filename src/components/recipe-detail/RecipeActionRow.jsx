@@ -13,6 +13,7 @@ import {
   removeFromFavorites,
 } from "@/lib/apiClient.client";
 import handleCheckout from "@/lib/handleCheckout";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 const IconPulse = ({ children, trigger }) => (
   <motion.span
@@ -48,54 +49,35 @@ const RecipeActionRow = ({
   const [likePulse, setLikePulse] = useState(0);
   const [favPulse, setFavPulse] = useState(0);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const guard = useAuthGuard();
 
-  const handleLike = async () => {
-    if (!userId) return; // must be logged in
-
-    const next = !liked;
-
-    // Optimistic update
-    setLiked(next);
-    setLikeCount((c) => c + (next ? 1 : -1));
-    setLikePulse((n) => n + 1);
-
-    const payload = { userId, recipeId };
-
-    try {
-      if (next) {
-        await likeRecipe(payload);
-      } else {
-        await unlikeRecipe(payload);
+  const handleLike = () =>
+    guard(async () => {
+      const next = !liked;
+      setLiked(next);
+      setLikeCount((c) => c + (next ? 1 : -1));
+      setLikePulse((n) => n + 1);
+      try {
+        if (next) await likeRecipe({ userId, recipeId });
+        else await unlikeRecipe({ userId, recipeId });
+      } catch {
+        setLiked(!next);
+        setLikeCount((c) => c + (next ? -1 : 1));
       }
-    } catch {
-      // Revert on failure
-      setLiked(!next);
-      setLikeCount((c) => c + (next ? -1 : 1));
-    }
-  };
+    });
 
-  const handleFavorite = async () => {
-    if (!userId) return; // must be logged in
-
-    const next = !favorited;
-
-    // Optimistic update
-    setFavorited(next);
-    setFavPulse((n) => n + 1);
-
-    const payload = { userId, recipeId };
-
-    try {
-      if (next) {
-        await addToFavorites(payload);
-      } else {
-        await removeFromFavorites(payload);
+  const handleFavorite = () =>
+    guard(async () => {
+      const next = !favorited;
+      setFavorited(next);
+      setFavPulse((n) => n + 1);
+      try {
+        if (next) await addToFavorites({ userId, recipeId });
+        else await removeFromFavorites({ userId, recipeId });
+      } catch {
+        setFavorited(!next);
       }
-    } catch {
-      // Revert on failure
-      setFavorited(!next);
-    }
-  };
+    });
 
   const showPurchaseButton = isPremium && !isPurchased;
   const showConfirmationChip = !isPremium || isPurchased;
@@ -205,17 +187,19 @@ const RecipeActionRow = ({
                 size="sm"
                 disabled={checkoutLoading}
                 onClick={async () => {
-                  setCheckoutLoading(true);
-                  try {
-                    await handleCheckout({
-                      recipeId,
-                      recipeName,
-                      price: priceAmount,
-                      recipeSlug,
-                    });
-                  } finally {
-                    setCheckoutLoading(false);
-                  }
+                  guard(async () => {
+                    setCheckoutLoading(true);
+                    try {
+                      await handleCheckout({
+                        recipeId,
+                        recipeName,
+                        price: priceAmount,
+                        recipeSlug,
+                      });
+                    } finally {
+                      setCheckoutLoading(false);
+                    }
+                  });
                 }}
                 className="gap-2 font-sans text-[13px] font-medium px-4"
               >

@@ -7,13 +7,10 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { signIn } from "@/lib/auth-client";
 
-/**
- * GoogleAuth — one-click Google OAuth button, consistent with email auth:
- *  - useTransition for non-blocking loading state (no separate useState)
- *  - Toast on error; Google redirects on success so no success toast needed
- *  - Disabled while the parent form is pending OR this button is pending
- */
-const GoogleAuth = ({ isPending: parentPending = false }) => {
+const GoogleAuth = ({
+  isPending: parentPending = false,
+  redirectTo = "/dashboard",
+}) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -21,7 +18,7 @@ const GoogleAuth = ({ isPending: parentPending = false }) => {
     startTransition(async () => {
       const { data, error } = await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: redirectTo,
       });
 
       if (error) {
@@ -33,8 +30,6 @@ const GoogleAuth = ({ isPending: parentPending = false }) => {
         return;
       }
 
-      // better-auth handles the redirect via callbackURL on success,
-      // but if data comes back without a redirect, push manually.
       if (data?.url) {
         router.push(data.url);
       }

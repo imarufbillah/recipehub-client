@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,8 @@ const LoginPage = () => {
   const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -58,7 +60,7 @@ const LoginPage = () => {
       }
 
       toast.success(`Welcome back, ${data?.user?.name ?? "Chef"}!`);
-      router.push("/dashboard");
+      router.push(redirectTo);
     });
   };
 
@@ -150,7 +152,7 @@ const LoginPage = () => {
           <Separator className="flex-1" />
         </div>
 
-        <GoogleAuth isPending={isPending} />
+        <GoogleAuth isPending={isPending} redirectTo={redirectTo} />
 
         <p className="text-center text-[13px] font-sans text-muted-foreground">
           New here?{" "}

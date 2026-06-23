@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import FormField from "@/components/ui/FormField";
 import PasswordStrength from "@/components/auth/PasswordStrength";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signUp } from "@/lib/auth-client";
 import GoogleAuth from "@/components/auth/GoogleAuth";
 
@@ -61,6 +61,8 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   // useTransition keeps the UI responsive during the async sign-up call.
   // isPending drives the button's loading state without a separate boolean.
@@ -95,7 +97,12 @@ const RegisterPage = () => {
       }
 
       toast.success(`Welcome to RecipeHub, ${data?.user?.name ?? "Chef"}!`);
-      router.push("/login");
+      // Carry the redirect param to login so it survives the sign-in step
+      const loginHref =
+        redirectTo !== "/dashboard"
+          ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+          : "/login";
+      router.push(loginHref);
     });
   };
 
@@ -218,7 +225,7 @@ const RegisterPage = () => {
           <Separator className="flex-1" />
         </div>
 
-        <GoogleAuth isPending={isPending} />
+        <GoogleAuth isPending={isPending} redirectTo={redirectTo} />
 
         <p className="text-center text-[13px] font-sans text-muted-foreground">
           Already have an account?{" "}

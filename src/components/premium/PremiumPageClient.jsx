@@ -6,6 +6,7 @@ import PremiumPageHeader from "./PremiumPageHeader";
 import PremiumOfferCard from "./PremiumOfferCard";
 import PremiumAlreadyMember from "./PremiumAlreadyMember";
 import PremiumSocialProof from "./PremiumSocialProof";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -18,29 +19,31 @@ const fadeUp = {
 
 const PremiumPageClient = ({ isPremium = false, price = "19.99" }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const guard = useAuthGuard();
 
-  const handleCheckout = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/checkout_sessions_premium", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price }),
-      });
+  const handleCheckout = () =>
+    guard(async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/api/checkout_sessions_premium", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ price }),
+        });
 
-      if (!res.ok) {
-        const { error } = await res.json().catch(() => ({}));
-        throw new Error(error ?? "Failed to start checkout");
+        if (!res.ok) {
+          const { error } = await res.json().catch(() => ({}));
+          throw new Error(error ?? "Failed to start checkout");
+        }
+
+        const { url } = await res.json();
+        if (!url) throw new Error("No checkout URL returned");
+        window.location.href = url;
+      } catch (err) {
+        console.error("[PremiumCheckout]", err);
+        setIsLoading(false);
       }
-
-      const { url } = await res.json();
-      if (!url) throw new Error("No checkout URL returned");
-      window.location.href = url;
-    } catch (err) {
-      console.error("[PremiumCheckout]", err);
-      setIsLoading(false);
-    }
-  };
+    });
 
   return (
     /*
