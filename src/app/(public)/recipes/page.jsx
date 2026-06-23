@@ -45,12 +45,23 @@ const RecipesPage = async ({ searchParams }) => {
     limit: "12",
   };
 
-  // Fetch categories, cuisines, and recipes in parallel
-  const [categories, cuisines, apiResponse] = await Promise.all([
-    getAllRecipeCategories(),
-    getAllRecipeCuisines(),
-    getAllRecipes(apiParams),
-  ]);
+  // Fetch categories, cuisines, and recipes in parallel; degrade gracefully on error
+  let categories = [];
+  let cuisines = [];
+  let apiResponse = { recipes: [], total: 0, totalPages: 1, page: 1 };
+
+  try {
+    const [catData, cuisineData, recipeData] = await Promise.all([
+      getAllRecipeCategories(),
+      getAllRecipeCuisines(),
+      getAllRecipes(apiParams),
+    ]);
+    categories = catData ?? [];
+    cuisines = cuisineData ?? [];
+    apiResponse = recipeData ?? apiResponse;
+  } catch (err) {
+    console.error("[RecipesPage]", err?.message);
+  }
 
   // Both endpoints now return [{ id, label }] directly — no normalisation needed
   const rawRecipes = apiResponse?.recipes ?? [];
