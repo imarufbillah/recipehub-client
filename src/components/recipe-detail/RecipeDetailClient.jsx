@@ -32,7 +32,9 @@ const RecipeDetailClient = ({
 
     await createReport({
       userId,
+      reporterName: user.name,
       recipeId,
+      recipeName,
       reason,
       ...(additionalContext ? { additionalContext } : {}),
     });
