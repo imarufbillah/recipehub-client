@@ -6,9 +6,14 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 // ─── Auth token (server-side) ─────────────────────────────────────────────────
 
 const getToken = async () => {
-  const reqHeaders = await headers();
-  const response = await auth.api.getToken({ headers: reqHeaders });
-  return response?.token ?? null;
+  try {
+    const reqHeaders = await headers();
+    const response = await auth.api.getToken({ headers: reqHeaders });
+    return response?.token ?? null;
+  } catch {
+    // No session — public request, proceed without a token
+    return null;
+  }
 };
 
 // ─── Core request helper ──────────────────────────────────────────────────────
@@ -16,8 +21,8 @@ const getToken = async () => {
 const request = async (method, path, body) => {
   const token = await getToken();
 
-  const reqHeaders = { Authorization: `Bearer ${token}` };
-
+  const reqHeaders = {};
+  if (token) reqHeaders["Authorization"] = `Bearer ${token}`;
   if (body !== undefined) reqHeaders["Content-Type"] = "application/json";
 
   const res = await fetch(`${BASE_URL}${path}`, {
