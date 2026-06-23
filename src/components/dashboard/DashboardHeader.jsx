@@ -146,6 +146,7 @@ const DashboardHeader = ({ title, role = "user", user }) => {
                 >
                   <DashboardUserDropdown
                     user={user}
+                    role={role}
                     onClose={() => setMenuOpen(false)}
                   />
                 </motion.div>

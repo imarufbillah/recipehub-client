@@ -7,32 +7,30 @@ import {
   ShoppingBag,
   LogOut,
   ShieldCheck,
+  Users,
+  ChefHat,
+  Flag,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
-const menuItems = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    href: "/dashboard/profile",
-    label: "Profile",
-    icon: User,
-  },
-  {
-    href: "/dashboard/favorites",
-    label: "Favorites",
-    icon: Bookmark,
-  },
+const userMenuItems = [
+  { href: "/dashboard/profile", label: "Profile", icon: User },
+  { href: "/dashboard/favorites", label: "Favorites", icon: Bookmark },
   {
     href: "/dashboard/purchased",
     label: "Purchased Recipes",
     icon: ShoppingBag,
   },
+];
+
+const adminMenuItems = [
+  { href: "/dashboard/manage-users", label: "Manage Users", icon: Users },
+  { href: "/dashboard/manage-recipes", label: "Manage Recipes", icon: ChefHat },
+  { href: "/dashboard/reports", label: "Reports", icon: Flag },
+  { href: "/dashboard/transactions", label: "Transactions", icon: CreditCard },
 ];
 
 const MenuItem = ({
@@ -125,21 +123,28 @@ const UserMenuDropdown = ({ user, onClose }) => {
       {/* ── 2. Navigation items ── */}
       <nav aria-label="User navigation">
         <ul className="px-2">
-          {menuItems.map((item) => (
-            <MenuItem key={item.href} {...item} onClick={onClose} />
-          ))}
-
-          {/* ── 3. Conditional admin row ── */}
-          {isAdmin && (
+          {/* Dashboard link — role-aware */}
+          {isAdmin ? (
             <MenuItem
               href="/dashboard"
               label="Admin Dashboard"
               icon={ShieldCheck}
               onClick={onClose}
-              // Accent-tinted icon only — not the whole row
               iconClassName="text-accent"
             />
+          ) : (
+            <MenuItem
+              href="/dashboard"
+              label="Dashboard"
+              icon={LayoutDashboard}
+              onClick={onClose}
+            />
           )}
+
+          {/* Role-specific secondary links */}
+          {(isAdmin ? adminMenuItems : userMenuItems).map((item) => (
+            <MenuItem key={item.href} {...item} onClick={onClose} />
+          ))}
         </ul>
       </nav>
 

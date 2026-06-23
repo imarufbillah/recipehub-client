@@ -3,11 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Bookmark, ShoppingBag, Crown, LogOut, Home } from "lucide-react";
+import {
+  User,
+  Bookmark,
+  ShoppingBag,
+  Crown,
+  LogOut,
+  Home,
+  Users,
+  ChefHat,
+  Flag,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 
-const MENU_ITEMS = [
+const USER_ITEMS = [
   { href: "/dashboard/profile", label: "Profile", icon: User },
   { href: "/dashboard/favorites", label: "Favorites", icon: Bookmark },
   {
@@ -16,6 +28,13 @@ const MENU_ITEMS = [
     icon: ShoppingBag,
   },
   { href: "/premium", label: "Premium", icon: Crown },
+];
+
+const ADMIN_ITEMS = [
+  { href: "/dashboard/manage-users", label: "Manage Users", icon: Users },
+  { href: "/dashboard/manage-recipes", label: "Manage Recipes", icon: ChefHat },
+  { href: "/dashboard/reports", label: "Reports", icon: Flag },
+  { href: "/dashboard/transactions", label: "Transactions", icon: CreditCard },
 ];
 
 const MenuItem = ({ href, label, icon: Icon, onClick, iconClassName }) => (
@@ -39,8 +58,9 @@ const MenuItem = ({ href, label, icon: Icon, onClick, iconClassName }) => (
   </li>
 );
 
-const DashboardUserDropdown = ({ user, onClose }) => {
+const DashboardUserDropdown = ({ user, role = "user", onClose }) => {
   const router = useRouter();
+  const isAdmin = role === "admin";
   const isPremium = user?.plan === "premium";
 
   const initial = user?.name
@@ -58,6 +78,10 @@ const DashboardUserDropdown = ({ user, onClose }) => {
     router.push("/");
   };
 
+  const menuItems = isAdmin
+    ? ADMIN_ITEMS
+    : USER_ITEMS.filter((item) => !(item.href === "/premium" && isPremium));
+
   return (
     <div
       role="menu"
@@ -72,7 +96,6 @@ const DashboardUserDropdown = ({ user, onClose }) => {
       {/* ── Identity header ── */}
       <div className="px-3 pt-2 pb-3">
         <div className="flex items-center gap-2.5">
-          {/* Avatar — 36px in dropdown header */}
           <span className="relative flex shrink-0 size-9 rounded-full overflow-hidden bg-muted">
             {user?.image ? (
               <Image
@@ -93,14 +116,21 @@ const DashboardUserDropdown = ({ user, onClose }) => {
             <span className="text-[13px] font-sans font-medium text-foreground leading-snug truncate">
               {user?.name}
             </span>
-            {/* Plan badge inline under name */}
             <span
               className={cn(
                 "text-[10px] uppercase tracking-[0.08em] font-medium font-sans leading-snug",
-                isPremium ? "text-accent" : "text-muted-foreground",
+                isAdmin
+                  ? "text-accent"
+                  : isPremium
+                    ? "text-accent"
+                    : "text-muted-foreground",
               )}
             >
-              {isPremium ? "Premium Member" : "Free Plan"}
+              {isAdmin
+                ? "Administrator"
+                : isPremium
+                  ? "Premium Member"
+                  : "Free Plan"}
             </span>
           </div>
         </div>
@@ -111,21 +141,20 @@ const DashboardUserDropdown = ({ user, onClose }) => {
       {/* ── Nav items ── */}
       <nav aria-label="Dashboard user navigation">
         <ul className="px-1.5">
-          {MENU_ITEMS.map((item) => {
-            // Hide Premium link for existing premium members — they don't need the upsell
-            if (item.href === "/premium" && isPremium) return null;
-            return (
-              <MenuItem
-                key={item.href}
-                {...item}
-                onClick={onClose}
-                // Accent tint on Premium link only — its one job in the system
-                iconClassName={
-                  item.href === "/premium" ? "text-accent" : undefined
-                }
-              />
-            );
-          })}
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.href}
+              {...item}
+              onClick={onClose}
+              iconClassName={
+                item.href === "/premium"
+                  ? "text-accent"
+                  : isAdmin && item.href === "/dashboard"
+                    ? "text-accent"
+                    : undefined
+              }
+            />
+          ))}
         </ul>
       </nav>
 
