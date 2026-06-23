@@ -4,22 +4,6 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import CuisineTile from "./CuisineTile";
 
-/**
- * Asymmetric cuisine tile grid — editorial magazine spread layout.
- *
- * Desktop layout (6 cuisines):
- * ┌─────────────────┬──────────┬──────────┐
- * │                 │  tile 2  │  tile 3  │
- * │  tile 1 (tall)  ├──────────┴──────────┤
- * │                 │       tile 4        │
- * ├────────┬────────┴──────────┬──────────┤
- * │ tile 5 │                   tile 6    │
- * └────────┴───────────────────┴──────────┘
- *
- * On mobile: single column stack, all standard height.
- *
- * Stagger: 70ms per tile, 0.7s ease-out, 12px translate-up.
- */
 const tileVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (i) => ({
@@ -29,6 +13,13 @@ const tileVariants = {
   }),
 };
 
+// Row heights: rows 1 & 2 each = 200px (tall tile spans both → 200+gap+200 ≈ 412px)
+// Row 3 = 220px for the wider bottom band.
+const GRID_STYLE = {
+  gridTemplateColumns: "1fr 1fr 1fr",
+  gridTemplateRows: "200px 200px 220px",
+};
+
 const CuisineGrid = ({ cuisines }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.1 });
@@ -36,13 +27,7 @@ const CuisineGrid = ({ cuisines }) => {
   return (
     <div ref={ref}>
       {/* ── Desktop asymmetric grid ── */}
-      <div
-        className="hidden md:grid gap-3"
-        style={{
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gridTemplateRows: "auto auto",
-        }}
-      >
+      <div className="hidden md:grid gap-3" style={GRID_STYLE}>
         {cuisines.map((cuisine, i) => (
           <motion.div
             key={cuisine.slug}
@@ -51,8 +36,9 @@ const CuisineGrid = ({ cuisines }) => {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
             style={getGridStyle(i)}
+            className="h-full min-h-0"
           >
-            <CuisineTile {...cuisine} tall={i === 0} />
+            <CuisineTile {...cuisine} />
           </motion.div>
         ))}
       </div>
@@ -67,7 +53,7 @@ const CuisineGrid = ({ cuisines }) => {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
           >
-            <CuisineTile {...cuisine} tall={false} />
+            <CuisineTile {...cuisine} mobile />
           </motion.div>
         ))}
       </div>

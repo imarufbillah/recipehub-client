@@ -122,8 +122,8 @@ const SidebarContent = ({ role, user, pathname, onLinkClick }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* ── Logo / Wordmark ── */}
-      <div className="px-5 py-5 border-b border-sidebar-border">
+      {/* ── Logo / Wordmark — h-14 matches the sticky header height ── */}
+      <div className="px-5 h-14 flex flex-col justify-center border-b border-sidebar-border">
         <Link
           href="/"
           onClick={onLinkClick}

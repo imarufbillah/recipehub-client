@@ -1,33 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 
-/**
- * Editorial cuisine tile — full-bleed cropped photo, serif cuisine name
- * overlaid at the bottom-left (magazine category tile treatment).
- *
- * Layers (bottom → top):
- *  1. Photography (fills the tile completely)
- *  2. Permanent bottom gradient scrim — ensures text legibility on any photo
- *  3. Hover darken overlay — subtle, not a color shift, just a dimming
- *  4. Text — serif name + muted recipe count, bottom-left
- *
- * Corner radius: rounded-sm (near-sharp) — per design system: "images and
- * large hero media should feel more architectural, sharper corners."
- *
- * Props:
- *  slug       — URL slug for the cuisine filter
- *  name       — display name (e.g. "Italian")
- *  recipeCount — e.g. 142
- *  image      — photo URL
- *  alt        — image alt text
- *  tall       — boolean, makes the tile taller (for layout asymmetry)
- */
-const CuisineTile = ({ slug, name, recipeCount, image, alt, tall = false }) => {
+const CuisineTile = ({
+  slug,
+  name,
+  recipeCount,
+  image,
+  alt,
+  mobile = false,
+}) => {
   return (
     <Link
       href={`/recipes?cuisine=${slug}`}
-      className="group/tile relative block w-full overflow-hidden rounded-sm"
-      style={{ height: tall ? "420px" : "280px" }}
+      className={[
+        "group/tile relative block w-full overflow-hidden rounded-sm",
+        mobile ? "h-50" : "h-full",
+      ].join(" ")}
     >
       {/* ── Photography ── */}
       <Image

@@ -1,11 +1,6 @@
 import AnimatedSectionHeader from "@/components/ui/AnimatedSectionHeader";
 import CuisineGrid from "./CuisineGrid";
 
-/**
- * 6 cuisines — maps exactly to the asymmetric 6-tile grid.
- * Photos selected for visual contrast between adjacent tiles:
- * light/dark, close-up/wider, warm/cool tones.
- */
 const CUISINES = [
   {
     slug: "italian",
@@ -20,8 +15,8 @@ const CUISINES = [
     name: "Japanese",
     recipeCount: 178,
     image:
-      "https://images.unsplash.com/photo-1617196034183-421b4040ed20?auto=format&fit=crop&w=700&q=80",
-    alt: "Precisely plated sushi and sashimi — Japanese cuisine",
+      "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80",
+    alt: "Steaming bowl of tonkotsu ramen with chashu pork — Japanese cuisine",
   },
   {
     slug: "middle-eastern",
