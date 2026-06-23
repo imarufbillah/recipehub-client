@@ -4,20 +4,6 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import RecipeCard from "./RecipeCard";
 
-/**
- * Animated recipe grid — staggered fade-up on scroll into view.
- * Separated as a "use client" island so parent components can stay server-side.
- *
- * Motion intent (design system):
- *  - 12px translate + opacity, ease-out, 0.7s duration per card
- *  - Stagger: 80ms per card
- *  - Triggers once when 10% of the grid enters the viewport
- *
- * Grid: 4 col desktop / 2 col tablet / 1 col mobile, 24–32px gutters.
- *
- * Props:
- *  recipes — array of recipe objects matching RecipeCard props
- */
 const cardVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (i) => ({
@@ -47,6 +33,7 @@ const RecipeGrid = ({ recipes }) => {
           variants={cardVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
+          className="h-full"
         >
           <RecipeCard {...recipe} />
         </motion.div>

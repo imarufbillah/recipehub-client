@@ -19,10 +19,11 @@ const normaliseRecipes = (raw = []) =>
     category: r.category,
     categoryId: r.category?.toLowerCase() ?? "",
     cuisine: r.cuisine,
-    difficulty: r.difficulty,
+    difficulty: r.difficulty ?? null,
     prepTime: `${r.prepTime} min`,
-    featured: r.isFeatured ?? false,
+    servings: r.servings ?? null,
     isPremium: r.isPremium ?? false,
+    likeCount: r.likeCount ?? 0,
     price: r.price ?? null,
     author: r.author ?? null,
   }));

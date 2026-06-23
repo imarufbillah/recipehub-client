@@ -12,8 +12,11 @@ const FeaturedRecipes = async () => {
       name: r.recipeName,
       category: r.category ?? "—",
       cuisine: r.cuisine ?? "—",
+      difficulty: r.difficulty ?? null,
       prepTime: r.prepTime ? `${r.prepTime} min` : "—",
-      featured: r.isPremium ?? false,
+      isPremium: r.isPremium ?? false,
+      likeCount: r.likeCount ?? 0,
+      author: r.author ?? null,
       image: r.imageUrl,
       alt: `${r.recipeName} — recipe photo`,
     }));
