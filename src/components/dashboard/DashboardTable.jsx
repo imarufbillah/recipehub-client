@@ -217,7 +217,9 @@ const DashboardTable = ({
                       key={col.key}
                       className="px-4 text-[13px] font-sans text-foreground whitespace-nowrap"
                     >
-                      {col.badge ? (
+                      {col.renderFn ? (
+                        col.renderFn(row)
+                      ) : col.badge ? (
                         <StatusBadge status={row[col.key]} />
                       ) : col.mono ? (
                         <span className="font-mono text-[12px] text-muted-foreground">

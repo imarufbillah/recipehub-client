@@ -1,4 +1,4 @@
-import { getAllRecipes } from "@/lib/apiClient.server";
+import { getAllRecipesAdmin } from "@/lib/apiClient.server";
 import ManageRecipesClient from "@/components/dashboard/ManageRecipesClient";
 
 const formatDate = (iso) =>
@@ -10,16 +10,17 @@ const formatDate = (iso) =>
 
 const ManageRecipesPage = async ({ searchParams }) => {
   const page = Number((await searchParams).page ?? 1);
-  const data = await getAllRecipes({ page, limit: 20 });
+  const data = await getAllRecipesAdmin(page, 20);
 
   const rows = (data.recipes ?? []).map((r) => ({
     id: r._id,
     name: r.recipeName,
-    author: r.authorName ?? r.author ?? "—",
+    author: r.author ?? "—",
     category: r.category ?? "—",
     submitted: r.createdAt ? formatDate(r.createdAt) : "—",
-    likes: r.likesCount ?? r.likes ?? 0,
-    status: r.isFeatured ? "Featured" : r.isPremium ? "Premium" : "Active",
+    likes: r.likeCount ?? 0,
+    isFeatured: r.isFeatured ?? false,
+    status: r.status === "premium" ? "Premium" : "Active",
   }));
 
   return (

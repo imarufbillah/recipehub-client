@@ -81,7 +81,5 @@ export const resolveReport = (reportId) =>
 
 // ─── Admin — recipe management ────────────────────────────────────────────────
 
-export const deleteRecipeAdmin = (recipeId) =>
-  request("DELETE", `/recipes/${recipeId}`);
 export const toggleFeaturedRecipe = (recipeId, isFeatured) =>
-  request("PATCH", `/recipes/${recipeId}`, { isFeatured });
+  request("PATCH", `/recipes/feature/${recipeId}`, { isFeatured });

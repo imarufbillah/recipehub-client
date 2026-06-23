@@ -28,7 +28,13 @@ import {
 } from "@/components/dashboard/recipeFormParts";
 import { updateRecipe } from "@/lib/apiClient.client";
 
-const EditRecipeForm = ({ recipe, user }) => {
+const EditRecipeForm = ({
+  recipe,
+  user,
+  onSuccess,
+  onCancel,
+  backHref = "/dashboard/my-recipes",
+}) => {
   // ── Form state seeded from existing recipe ──────────────────────────────────
   const [recipeName, setName] = useState(recipe.recipeName ?? "");
   const [description, setDescription] = useState(recipe.description ?? "");
@@ -125,12 +131,17 @@ const EditRecipeForm = ({ recipe, user }) => {
     };
 
     startSubmit(async () => {
-      toast.promise(await updateRecipe(recipe._id, payload), {
-        loading: "Saving changes…",
-        success: "Recipe updated.",
-        error: (err) => err?.message ?? "Could not save changes.",
-      });
-      router.push("/dashboard/my-recipes");
+      try {
+        await updateRecipe(recipe._id, payload);
+        if (onSuccess) {
+          onSuccess(recipe._id, payload);
+        } else {
+          toast.success("Recipe updated.");
+          router.push(backHref);
+        }
+      } catch (err) {
+        toast.error(err?.message ?? "Could not save changes.");
+      }
     });
   };
 
@@ -364,7 +375,7 @@ const EditRecipeForm = ({ recipe, user }) => {
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => router.push("/dashboard/my-recipes")}
+            onClick={() => (onCancel ? onCancel() : router.push(backHref))}
             disabled={isPending}
             className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0"
           >
