@@ -65,6 +65,8 @@ export const getAllRecipes = (params = {}) => {
   return request("GET", `/recipes${query ? `?${query}` : ""}`);
 };
 export const getRecipeById = (id) => request("GET", `/recipes/${id}`);
+export const getFeaturedRecipes = () => request("GET", "/recipes/featured");
+export const getMostLikedRecipes = () => request("GET", "/recipes/most-liked");
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 
