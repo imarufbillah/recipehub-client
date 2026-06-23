@@ -20,7 +20,7 @@ const ManageRecipesPage = async ({ searchParams }) => {
     submitted: r.createdAt ? formatDate(r.createdAt) : "—",
     likes: r.likeCount ?? 0,
     isFeatured: r.isFeatured ?? false,
-    status: r.status === "premium" ? "Premium" : "Active",
+    status: r.status ?? "active",
   }));
 
   return (

@@ -2,17 +2,17 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Trash2 } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import DashboardTable from "@/components/dashboard/DashboardTable";
-import { deleteReport, resolveReport } from "@/lib/apiClient.client";
+import { reviewReport } from "@/lib/apiClient.client";
 
 const COLUMNS = [
   { key: "recipe", label: "Reported Recipe" },
   { key: "reporter", label: "Reporter", width: "w-36" },
   { key: "reason", label: "Reason", width: "w-40" },
   { key: "date", label: "Date", width: "w-28" },
-  { key: "status", label: "Status", width: "w-24", badge: true },
+  { key: "status", label: "Status", width: "w-28", badge: true },
 ];
 
 const ManageReportsClient = ({ initialRows, totalPages, currentPage }) => {
@@ -25,8 +25,8 @@ const ManageReportsClient = ({ initialRows, totalPages, currentPage }) => {
   const handleResolve = async (row) => {
     if (row.status === "Resolved") return;
     try {
-      await resolveReport(row.id);
-      toast.success("Report marked as resolved.");
+      await reviewReport(row.id, { action: "resolve" });
+      toast.success("Report resolved.");
       setRows((prev) =>
         prev.map((r) => (r.id === row.id ? { ...r, status: "Resolved" } : r)),
       );
@@ -36,29 +36,33 @@ const ManageReportsClient = ({ initialRows, totalPages, currentPage }) => {
     }
   };
 
-  const handleDelete = async (row) => {
-    if (!confirm("Dismiss this report? This cannot be undone.")) return;
+  const handleDismiss = async (row) => {
+    if (row.status === "Dismissed") return;
     try {
-      await deleteReport(row.id);
+      await reviewReport(row.id, { action: "dismiss" });
       toast.success("Report dismissed.");
-      setRows((prev) => prev.filter((r) => r.id !== row.id));
+      setRows((prev) =>
+        prev.map((r) => (r.id === row.id ? { ...r, status: "Dismissed" } : r)),
+      );
       refresh();
     } catch {
-      toast.error("Delete failed. Please try again.");
+      toast.error("Action failed. Please try again.");
     }
   };
 
   const actions = [
     {
       icon: Check,
-      label: "Mark as resolved",
+      label: "Resolve report",
       onClick: handleResolve,
+      disabledFn: (row) => row.status !== "Pending",
     },
     {
-      icon: Trash2,
+      icon: X,
       label: "Dismiss report",
-      onClick: handleDelete,
+      onClick: handleDismiss,
       variant: "destructive",
+      disabledFn: (row) => row.status !== "Pending",
     },
   ];
 

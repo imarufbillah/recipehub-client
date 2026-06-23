@@ -74,10 +74,8 @@ export const deleteUser = (userId) => request("DELETE", `/users/${userId}`);
 
 // ─── Admin — report management ────────────────────────────────────────────────
 
-export const deleteReport = (reportId) =>
-  request("DELETE", `/reports/${reportId}`);
-export const resolveReport = (reportId) =>
-  request("PATCH", `/reports/${reportId}/resolve`);
+export const reviewReport = (reportId, data) =>
+  request("PATCH", `/reports/review/${reportId}`, data);
 
 // ─── Admin — recipe management ────────────────────────────────────────────────
 

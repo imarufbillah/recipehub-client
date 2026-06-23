@@ -14,11 +14,16 @@ const ReportsPage = async ({ searchParams }) => {
 
   const rows = (data.reports ?? []).map((r) => ({
     id: r._id,
-    recipe: r.recipeName ?? r.recipe ?? "—",
-    reporter: r.reporterName ?? r.reporter ?? "—",
+    recipe: r.recipeName ?? "—",
+    reporter: r.reporterName ?? "—",
     reason: r.reason ?? "—",
     date: r.createdAt ? formatDate(r.createdAt) : "—",
-    status: r.status === "resolved" ? "Resolved" : "Open",
+    status:
+      r.status === "resolved"
+        ? "Resolved"
+        : r.status === "dismissed"
+          ? "Dismissed"
+          : "Pending",
   }));
 
   return (

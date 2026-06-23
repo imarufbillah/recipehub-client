@@ -15,10 +15,12 @@ const STATUS_STYLES = {
     "bg-secondary text-secondary-foreground border-transparent rounded-sm",
   inactive: "bg-muted text-muted-foreground border-transparent rounded-sm",
   blocked: "bg-destructive/10 text-destructive border-transparent rounded-sm",
+  flagged: "bg-destructive/10 text-destructive border-transparent rounded-sm",
   featured: "bg-accent text-accent-foreground border-transparent rounded-sm",
   pending: "bg-muted text-muted-foreground border-transparent rounded-sm",
   resolved:
     "bg-secondary text-secondary-foreground border-transparent rounded-sm",
+  dismissed: "bg-muted text-muted-foreground border-transparent rounded-sm",
   open: "bg-destructive/10 text-destructive border-transparent rounded-sm",
   premium: "bg-accent/15 text-accent border-transparent rounded-sm",
   free: "bg-muted text-muted-foreground border-transparent rounded-sm",
@@ -250,25 +252,32 @@ const DashboardTable = ({
                             labelFn,
                             onClick,
                             variant,
+                            disabledFn,
                           }) => {
                             const ResolvedIcon = iconFn ? iconFn(row) : Icon;
                             const resolvedLabel = labelFn
                               ? labelFn(row)
                               : label;
+                            const isDisabled = disabledFn
+                              ? disabledFn(row)
+                              : false;
                             return (
                               <button
                                 key={label}
                                 type="button"
-                                onClick={() => onClick?.(row)}
+                                onClick={() => !isDisabled && onClick?.(row)}
                                 aria-label={resolvedLabel}
                                 title={resolvedLabel}
+                                disabled={isDisabled}
                                 className={cn(
                                   "size-7 flex items-center justify-center rounded",
                                   "transition-colors duration-150",
                                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                  variant === "destructive"
-                                    ? "text-muted-foreground/50 hover:text-destructive"
-                                    : "text-muted-foreground/50 hover:text-foreground",
+                                  isDisabled
+                                    ? "text-muted-foreground/20 cursor-not-allowed"
+                                    : variant === "destructive"
+                                      ? "text-muted-foreground/50 hover:text-destructive"
+                                      : "text-muted-foreground/50 hover:text-foreground",
                                 )}
                               >
                                 <ResolvedIcon
