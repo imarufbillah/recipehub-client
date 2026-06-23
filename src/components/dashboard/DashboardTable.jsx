@@ -251,6 +251,7 @@ const DashboardTable = ({
                             label,
                             labelFn,
                             onClick,
+                            hrefFn,
                             variant,
                             disabledFn,
                           }) => {
@@ -261,24 +262,45 @@ const DashboardTable = ({
                             const isDisabled = disabledFn
                               ? disabledFn(row)
                               : false;
+                            const href = hrefFn ? hrefFn(row) : null;
+
+                            const sharedClassName = cn(
+                              "size-7 flex items-center justify-center rounded",
+                              "transition-colors duration-150",
+                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                              isDisabled
+                                ? "text-muted-foreground/20 cursor-not-allowed pointer-events-none"
+                                : variant === "destructive"
+                                  ? "text-muted-foreground/50 hover:text-destructive"
+                                  : "text-muted-foreground/50 hover:text-foreground",
+                            );
+
+                            if (href && !isDisabled) {
+                              return (
+                                <Link
+                                  key={resolvedLabel}
+                                  href={href}
+                                  aria-label={resolvedLabel}
+                                  title={resolvedLabel}
+                                  className={sharedClassName}
+                                >
+                                  <ResolvedIcon
+                                    className="size-3.5"
+                                    aria-hidden
+                                  />
+                                </Link>
+                              );
+                            }
+
                             return (
                               <button
-                                key={label}
+                                key={resolvedLabel}
                                 type="button"
                                 onClick={() => !isDisabled && onClick?.(row)}
                                 aria-label={resolvedLabel}
                                 title={resolvedLabel}
                                 disabled={isDisabled}
-                                className={cn(
-                                  "size-7 flex items-center justify-center rounded",
-                                  "transition-colors duration-150",
-                                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                  isDisabled
-                                    ? "text-muted-foreground/20 cursor-not-allowed"
-                                    : variant === "destructive"
-                                      ? "text-muted-foreground/50 hover:text-destructive"
-                                      : "text-muted-foreground/50 hover:text-foreground",
-                                )}
+                                className={sharedClassName}
                               >
                                 <ResolvedIcon
                                   className="size-3.5"
