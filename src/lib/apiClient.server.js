@@ -126,3 +126,19 @@ export const getAllReports = (page = 1, limit = 20) =>
 
 export const getAllRecipesAdmin = (page = 1, limit = 20) =>
   request("GET", `/recipes/admin?page=${page}&limit=${limit}`);
+
+// ─── Admin — transactions ─────────────────────────────────────────────────────
+
+export const getAllTransactions = (params = {}) => {
+  const qs = new URLSearchParams();
+  const allowed = ["type", "status", "from", "to", "q", "page", "limit"];
+  for (const key of allowed) {
+    const value = params[key];
+    if (value === undefined || value === null || value === "") continue;
+    qs.set(key, String(value));
+  }
+  const query = qs.toString();
+  return request("GET", `/transactions${query ? `?${query}` : ""}`);
+};
+
+export const getTransactionStats = () => request("GET", "/transactions/stats");
