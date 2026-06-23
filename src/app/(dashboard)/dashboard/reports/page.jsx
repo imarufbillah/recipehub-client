@@ -10,7 +10,13 @@ const formatDate = (iso) =>
 
 const ReportsPage = async ({ searchParams }) => {
   const page = Number((await searchParams).page ?? 1);
-  const data = await getAllReports(page, 20);
+
+  let data = { reports: [], totalPages: 1, page: 1 };
+  try {
+    data = await getAllReports(page, 20);
+  } catch (err) {
+    console.error("[ReportsPage]", err?.message);
+  }
 
   const rows = (data.reports ?? []).map((r) => ({
     id: r._id,

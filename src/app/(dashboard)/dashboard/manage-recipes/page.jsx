@@ -10,7 +10,13 @@ const formatDate = (iso) =>
 
 const ManageRecipesPage = async ({ searchParams }) => {
   const page = Number((await searchParams).page ?? 1);
-  const data = await getAllRecipesAdmin(page, 20);
+
+  let data = { recipes: [], totalPages: 1, page: 1 };
+  try {
+    data = await getAllRecipesAdmin(page, 20);
+  } catch (err) {
+    console.error("[ManageRecipesPage]", err?.message);
+  }
 
   const rows = (data.recipes ?? []).map((r) => ({
     id: r._id,

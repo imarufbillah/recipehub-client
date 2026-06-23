@@ -10,7 +10,13 @@ const formatDate = (iso) =>
 
 const ManageUsersPage = async ({ searchParams }) => {
   const page = Number((await searchParams).page ?? 1);
-  const data = await getAllUsers(page, 20);
+
+  let data = { users: [], totalPages: 1, page: 1 };
+  try {
+    data = await getAllUsers(page, 20);
+  } catch (err) {
+    console.error("[ManageUsersPage]", err?.message);
+  }
 
   const rows = (data.users ?? []).map((u) => ({
     id: u._id,

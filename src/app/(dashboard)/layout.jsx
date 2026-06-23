@@ -1,8 +1,23 @@
+import { redirect } from "next/navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { getServerSession } from "@/lib/session";
 
 const DashboardLayout = async ({ children }) => {
-  const { user } = await getServerSession();
+  let session = null;
+  try {
+    session = await getServerSession();
+  } catch {
+    // Session fetch failed (e.g. auth service unreachable) — treat as logged out
+  }
+
+  const user = session?.user ?? null;
+
+  // Proxy handles the typical redirect, but guard here as a fallback so the
+  // layout never crashes trying to read role/name off a null user.
+  if (!user) {
+    redirect("/login");
+  }
+
   const role = user.role;
 
   return (

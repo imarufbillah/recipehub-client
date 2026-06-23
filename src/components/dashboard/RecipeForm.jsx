@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import uploadToImgbb from "@/lib/uploadToImgbb";
 import { createRecipe } from "@/lib/apiClient.client";
 import {
@@ -129,13 +128,17 @@ const RecipeForm = ({ user, initialData }) => {
     };
 
     startSubmit(async () => {
-      toast.promise(await createRecipe(payload), {
-        loading: "Publishing recipe…",
-        success: "Recipe published.",
-        error: (err) => err?.message ?? "Something went wrong.",
-      });
-      resetForm();
-      router.push("/dashboard/my-recipes");
+      try {
+        toast.promise(await createRecipe(payload), {
+          loading: "Publishing recipe…",
+          success: "Recipe published.",
+          error: (err) => err?.message ?? "Something went wrong.",
+        });
+        resetForm();
+        router.push("/dashboard/my-recipes");
+      } catch {
+        // Error already surfaced by toast.promise above — no double-toast needed
+      }
     });
   };
 
