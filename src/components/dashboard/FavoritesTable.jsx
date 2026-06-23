@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BookmarkX } from "lucide-react";
+import { BookmarkX, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import DashboardTable from "@/components/dashboard/DashboardTable";
 import { removeFromFavorites } from "@/lib/apiClient.client";
@@ -42,6 +42,11 @@ const FavoritesTable = ({ rows: initialRows, userId }) => {
   };
 
   const actions = [
+    {
+      icon: ExternalLink,
+      label: "View recipe details",
+      hrefFn: (row) => `/recipes/${row.id}`,
+    },
     {
       icon: BookmarkX,
       label: "Remove from favorites",
