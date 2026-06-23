@@ -14,6 +14,7 @@ import {
   Users,
   ClipboardList,
   Flag,
+  CreditCard,
   X,
   Globe,
   Utensils,
@@ -40,6 +41,7 @@ const ADMIN_NAV = [
     icon: ClipboardList,
   },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
+  { href: "/dashboard/transactions", label: "Transactions", icon: CreditCard },
 ];
 
 const QUICK_LINKS = [
