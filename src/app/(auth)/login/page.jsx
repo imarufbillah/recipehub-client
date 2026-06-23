@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,7 +26,7 @@ const validateForm = ({ email, password }) => {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-const LoginPage = () => {
+const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -167,5 +168,15 @@ const LoginPage = () => {
     </div>
   );
 };
+
+const LoginPage = () => (
+  <Suspense
+    fallback={
+      <div className="w-full max-w-md h-125 bg-card border border-border rounded-xl animate-pulse" />
+    }
+  >
+    <LoginForm />
+  </Suspense>
+);
 
 export default LoginPage;

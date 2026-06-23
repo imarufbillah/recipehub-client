@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, ImageIcon } from "lucide-react";
@@ -53,7 +54,7 @@ const validateForm = ({ name, email, imageUrl, password }) => {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-const RegisterPage = () => {
+const RegisterForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -240,5 +241,15 @@ const RegisterPage = () => {
     </div>
   );
 };
+
+const RegisterPage = () => (
+  <Suspense
+    fallback={
+      <div className="w-full max-w-md h-140 bg-card border border-border rounded-xl animate-pulse" />
+    }
+  >
+    <RegisterForm />
+  </Suspense>
+);
 
 export default RegisterPage;
