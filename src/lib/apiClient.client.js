@@ -64,3 +64,24 @@ export const createReport = (data) => request("POST", "/reports", data);
 
 export const updateUser = (userId, data) =>
   request("PATCH", `/users/${userId}`, data);
+
+// ─── Admin — user management ──────────────────────────────────────────────────
+
+export const blockUser = (userId) => request("PATCH", `/users/block/${userId}`);
+export const unblockUser = (userId) =>
+  request("PATCH", `/users/unblock/${userId}`);
+export const deleteUser = (userId) => request("DELETE", `/users/${userId}`);
+
+// ─── Admin — report management ────────────────────────────────────────────────
+
+export const deleteReport = (reportId) =>
+  request("DELETE", `/reports/${reportId}`);
+export const resolveReport = (reportId) =>
+  request("PATCH", `/reports/${reportId}/resolve`);
+
+// ─── Admin — recipe management ────────────────────────────────────────────────
+
+export const deleteRecipeAdmin = (recipeId) =>
+  request("DELETE", `/recipes/${recipeId}`);
+export const toggleFeaturedRecipe = (recipeId, isFeatured) =>
+  request("PATCH", `/recipes/${recipeId}`, { isFeatured });

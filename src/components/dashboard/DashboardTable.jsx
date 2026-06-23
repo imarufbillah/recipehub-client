@@ -6,28 +6,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-/**
- * DashboardTable — reusable admin table component.
- *
- * Admin Mode design spec:
- *  - Dense row height (h-11) — control-room feel, not magazine.
- *  - Column headers: micro-label uppercase, muted-foreground, sans.
- *    Hairline border-bottom under the header row.
- *  - Row dividers: hairline border-b between rows — no zebra striping,
- *    relying on clean borders for separation (more refined than alternating fills).
- *  - Action buttons: small ghost icon-buttons right-aligned per row.
- *    Never full-text buttons — too heavy for dense table rows.
- *  - Status badges: small pill, radius-sm. Rendered client-side from status strings.
- *  - Compact pagination below each table.
- *
- * Props:
- *  columns   — array of { key, label, width?, badge? } column definitions.
- *              Set badge: true on a column to auto-render its value as a StatusBadge.
- *  rows      — array of plain serialisable row objects (strings/numbers only).
- *  actions   — array of { icon, label, onClick, variant? } per-row action defs.
- *  pageSize  — rows per page (default 10).
- */
-
 // ─── Status badge ────────────────────────────────────────────────────────────
 
 // Maps status strings to shadcn Badge className overrides.
@@ -155,14 +133,28 @@ const DashboardTable = ({
   rows = [],
   actions = [],
   pageSize = 10,
+  // When provided, pagination is server-driven — DashboardTable just renders
+  // the controls and calls onPageChange(n) instead of slicing rows locally.
+  serverPagination = null, // { totalPages, currentPage }
+  onPageChange = null,
 }) => {
-  const [page, setPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const visibleRows = rows.slice(
-    (safePage - 1) * pageSize,
-    safePage * pageSize,
-  );
+  const [localPage, setLocalPage] = useState(1);
+
+  const isServer = Boolean(serverPagination);
+  const totalPages = isServer
+    ? Math.max(1, serverPagination.totalPages)
+    : Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = isServer
+    ? serverPagination.currentPage
+    : Math.min(localPage, totalPages);
+  const visibleRows = isServer
+    ? rows
+    : rows.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+  const handlePageChange = (p) => {
+    if (isServer) onPageChange?.(p);
+    else setLocalPage(p);
+  };
 
   return (
     <div className="flex flex-col">
@@ -249,25 +241,41 @@ const DashboardTable = ({
                     <td className="px-4 text-right">
                       <div className="inline-flex items-center justify-end gap-0.5">
                         {actions.map(
-                          ({ icon: Icon, label, onClick, variant }) => (
-                            <button
-                              key={label}
-                              type="button"
-                              onClick={() => onClick?.(row)}
-                              aria-label={label}
-                              title={label}
-                              className={cn(
-                                "size-7 flex items-center justify-center rounded",
-                                "transition-colors duration-150",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                variant === "destructive"
-                                  ? "text-muted-foreground/50 hover:text-destructive"
-                                  : "text-muted-foreground/50 hover:text-foreground",
-                              )}
-                            >
-                              <Icon className="size-3.5" aria-hidden />
-                            </button>
-                          ),
+                          ({
+                            icon: Icon,
+                            iconFn,
+                            label,
+                            labelFn,
+                            onClick,
+                            variant,
+                          }) => {
+                            const ResolvedIcon = iconFn ? iconFn(row) : Icon;
+                            const resolvedLabel = labelFn
+                              ? labelFn(row)
+                              : label;
+                            return (
+                              <button
+                                key={label}
+                                type="button"
+                                onClick={() => onClick?.(row)}
+                                aria-label={resolvedLabel}
+                                title={resolvedLabel}
+                                className={cn(
+                                  "size-7 flex items-center justify-center rounded",
+                                  "transition-colors duration-150",
+                                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                  variant === "destructive"
+                                    ? "text-muted-foreground/50 hover:text-destructive"
+                                    : "text-muted-foreground/50 hover:text-foreground",
+                                )}
+                              >
+                                <ResolvedIcon
+                                  className="size-3.5"
+                                  aria-hidden
+                                />
+                              </button>
+                            );
+                          },
                         )}
                       </div>
                     </td>
@@ -283,7 +291,7 @@ const DashboardTable = ({
       <CompactPagination
         current={safePage}
         total={totalPages}
-        onChange={setPage}
+        onChange={handlePageChange}
       />
     </div>
   );

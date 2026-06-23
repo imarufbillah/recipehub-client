@@ -53,6 +53,11 @@ export const auth = betterAuth({
         defaultValue: 0,
         input: false,
       },
+      isBlocked: {
+        type: Boolean,
+        defaultValue: false,
+        input: false,
+      },
     },
   },
 });

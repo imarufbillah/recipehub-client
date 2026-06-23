@@ -108,3 +108,25 @@ export const getPurchasesByUserId = (userId) =>
 
 export const createSubscription = (data) =>
   request("POST", "/subscriptions", data);
+
+// ─── Admin — aggregate stats ──────────────────────────────────────────────────
+
+export const getTotalUsers = () => request("GET", "/users/total");
+export const getTotalRecipes = () => request("GET", "/recipes/total");
+export const getTotalPremiumMembers = () => request("GET", "/users/premium");
+export const getTotalReports = () => request("GET", "/reports/total");
+
+// ─── Admin — user management ──────────────────────────────────────────────────
+
+export const getAllUsers = (page = 1, limit = 20) =>
+  request("GET", `/users?page=${page}&limit=${limit}`);
+
+// ─── Admin — report management ────────────────────────────────────────────────
+
+export const getAllReports = (page = 1, limit = 20) =>
+  request("GET", `/reports?page=${page}&limit=${limit}`);
+
+// ─── Admin — recipe management ────────────────────────────────────────────────
+
+export const getAllRecipesAdmin = (page = 1, limit = 20) =>
+  request("GET", `/recipes/admin?page=${page}&limit=${limit}`);
