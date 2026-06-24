@@ -25,7 +25,8 @@ const RecipeDetailHero = ({ image, alt, priority = true }) => {
           alt={alt}
           fill
           priority={priority}
-          sizes="55vw"
+          quality={100}
+          sizes="(max-width: 1024px) 100vw, 50vw"
           className={cn(
             "object-cover object-center transition-opacity duration-500",
             loaded ? "opacity-100" : "opacity-0",
