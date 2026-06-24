@@ -1,10 +1,17 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Search, X, ChevronDown, SlidersHorizontal, Crown } from "lucide-react";
+import { Search, X, SlidersHorizontal, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DIFFICULTIES, SORT_OPTIONS } from "@/lib/recipeConstants";
 import useDebounce from "@/hooks/useDebounce";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const PREP_TIME_OPTIONS = [
   { label: "Any time", value: "" },
@@ -34,10 +41,10 @@ const toggleInArray = (arr, val) =>
 
 const MultiChipGroup = ({
   options,
-  activeValues = [], // string[]
-  onSelect, // (newValues: string[]) => void
+  activeValues = [],
+  onSelect,
   accentActive = false,
-  hasAllOption = true, // prepend an "All" chip that clears selection
+  hasAllOption = true,
 }) => {
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -62,6 +69,22 @@ const MultiChipGroup = ({
       ro.disconnect();
     };
   }, [updateFades]);
+
+  // ── Mouse wheel → horizontal scroll (desktop) ────────────────────────────
+  const handleWheel = useCallback((e) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (el.scrollWidth <= el.clientWidth) return;
+    e.preventDefault();
+    el.scrollLeft += e.deltaY + e.deltaX;
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, [handleWheel]);
 
   const isAllActive = activeValues.length === 0;
 
@@ -158,6 +181,47 @@ const AdvancedFilterBar = ({
   const searchInputRef = useRef(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
+  // ── Local optimistic state — updates instantly on interaction ──────────────
+  // Each value syncs back from `params` only when changed externally
+  // (browser back/forward, clear filters, programmatic navigation).
+  const [localCategories, setLocalCategories] = useState(
+    parseMulti(params.category),
+  );
+  const [localCuisines, setLocalCuisines] = useState(
+    parseMulti(params.cuisine),
+  );
+  const [localDifficulty, setLocalDifficulty] = useState(
+    params.difficulty ?? "",
+  );
+  const [localMaxPrepTime, setLocalMaxPrepTime] = useState(
+    params.maxPrepTime ?? "",
+  );
+  const [localIsPremium, setLocalIsPremium] = useState(params.isPremium ?? "");
+  const [localSort, setLocalSort] = useState(params.sort ?? "newest");
+
+  // Sync local state when URL params change externally (back/forward, clear filters).
+  // Block-disable is intentional — these are correct derived-state syncs, not cascading renders.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setLocalCategories(parseMulti(params.category));
+  }, [params.category]);
+  useEffect(() => {
+    setLocalCuisines(parseMulti(params.cuisine));
+  }, [params.cuisine]);
+  useEffect(() => {
+    setLocalDifficulty(params.difficulty ?? "");
+  }, [params.difficulty]);
+  useEffect(() => {
+    setLocalMaxPrepTime(params.maxPrepTime ?? "");
+  }, [params.maxPrepTime]);
+  useEffect(() => {
+    setLocalIsPremium(params.isPremium ?? "");
+  }, [params.isPremium]);
+  useEffect(() => {
+    setLocalSort(params.sort ?? "newest");
+  }, [params.sort]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
   // Local search state — debounced before hitting URL/API
   const [searchValue, setSearchValue] = useState(params.q ?? "");
   const debouncedSearch = useDebounce(searchValue, 300);
@@ -174,16 +238,12 @@ const AdvancedFilterBar = ({
     setSearchValue(params.q ?? "");
   }, [params.q]);
 
-  // Parse multi-value URL params back to arrays
-  const selectedCategories = parseMulti(params.category);
-  const selectedCuisines = parseMulti(params.cuisine);
-
   // Count active advanced filters for the badge
   const advancedFilterCount = [
-    selectedCuisines.length > 0 ? "cuisine" : null,
-    params.difficulty,
-    params.maxPrepTime,
-    params.isPremium,
+    localCuisines.length > 0 ? "cuisine" : null,
+    localDifficulty,
+    localMaxPrepTime,
+    localIsPremium,
   ].filter(Boolean).length;
 
   const difficultyOptions = [
@@ -196,7 +256,7 @@ const AdvancedFilterBar = ({
     setTimeout(() => searchInputRef.current?.focus(), 50);
   };
   const handleSearchCollapse = () => {
-    if (!params.q) setSearchExpanded(false);
+    if (!searchValue) setSearchExpanded(false);
   };
 
   return (
@@ -207,8 +267,11 @@ const AdvancedFilterBar = ({
           {/* Category chips — multi-select */}
           <MultiChipGroup
             options={categories}
-            activeValues={selectedCategories}
-            onSelect={(vals) => onFilterChange("category", vals)}
+            activeValues={localCategories}
+            onSelect={(vals) => {
+              setLocalCategories(vals);
+              onFilterChange("category", vals);
+            }}
           />
 
           {/* Desktop search */}
@@ -307,29 +370,33 @@ const AdvancedFilterBar = ({
             )}
           </button>
 
-          {/* Sort select */}
-          <div className="relative shrink-0 hidden sm:block">
-            <select
-              value={params.sort ?? "newest"}
-              onChange={(e) => onFilterChange("sort", e.target.value)}
-              aria-label="Sort recipes"
-              className={cn(
-                "h-8 pl-3 pr-7 rounded-md border border-input appearance-none",
-                "bg-background text-[11px] uppercase tracking-[0.08em] font-medium font-sans text-muted-foreground",
-                "focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer",
-                "transition-colors duration-200 hover:border-foreground/20",
-              )}
+          {/* Sort select — shadcn Select */}
+          <div className="shrink-0 hidden sm:block">
+            <Select
+              value={localSort}
+              onValueChange={(val) => {
+                setLocalSort(val);
+                onFilterChange("sort", val);
+              }}
             >
-              {SORT_OPTIONS.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground pointer-events-none"
-              aria-hidden
-            />
+              <SelectTrigger
+                className="h-8 w-36 text-[11px] uppercase tracking-[0.08em] font-medium font-sans text-muted-foreground border-input bg-background focus:ring-ring"
+                aria-label="Sort recipes"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map(({ value, label }) => (
+                  <SelectItem
+                    key={value}
+                    value={value}
+                    className="text-[12px] font-sans"
+                  >
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Clear all — only when filters are active */}
@@ -356,8 +423,11 @@ const AdvancedFilterBar = ({
               </span>
               <MultiChipGroup
                 options={cuisines}
-                activeValues={selectedCuisines}
-                onSelect={(vals) => onFilterChange("cuisine", vals)}
+                activeValues={localCuisines}
+                onSelect={(vals) => {
+                  setLocalCuisines(vals);
+                  onFilterChange("cuisine", vals);
+                }}
               />
             </div>
 
@@ -368,17 +438,16 @@ const AdvancedFilterBar = ({
               </span>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {difficultyOptions.map(({ id, label }) => {
-                  const isActive = (params.difficulty ?? "") === id;
+                  const isActive = localDifficulty === id;
                   return (
                     <button
                       key={id}
                       type="button"
-                      onClick={() =>
-                        onFilterChange(
-                          "difficulty",
-                          isActive && id !== "" ? "" : id,
-                        )
-                      }
+                      onClick={() => {
+                        const next = isActive && id !== "" ? "" : id;
+                        setLocalDifficulty(next);
+                        onFilterChange("difficulty", next);
+                      }}
                       className={cn(
                         "shrink-0 inline-flex items-center px-3 py-1.5 rounded-full",
                         "text-[11px] uppercase tracking-[0.08em] font-medium font-sans",
@@ -406,14 +475,16 @@ const AdvancedFilterBar = ({
                 </span>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {PREP_TIME_OPTIONS.map(({ label, value }) => {
-                    const isActive = (params.maxPrepTime ?? "") === value;
+                    const isActive = localMaxPrepTime === value;
                     return (
                       <button
                         key={value}
                         type="button"
-                        onClick={() =>
-                          onFilterChange("maxPrepTime", isActive ? "" : value)
-                        }
+                        onClick={() => {
+                          const next = isActive ? "" : value;
+                          setLocalMaxPrepTime(next);
+                          onFilterChange("maxPrepTime", next);
+                        }}
                         className={cn(
                           "shrink-0 inline-flex items-center px-3 py-1.5 rounded-full",
                           "text-[11px] uppercase tracking-[0.08em] font-medium font-sans",
@@ -439,22 +510,21 @@ const AdvancedFilterBar = ({
                 </span>
                 <button
                   type="button"
-                  onClick={() =>
-                    onFilterChange(
-                      "isPremium",
-                      params.isPremium === "true" ? "" : "true",
-                    )
-                  }
+                  onClick={() => {
+                    const next = localIsPremium === "true" ? "" : "true";
+                    setLocalIsPremium(next);
+                    onFilterChange("isPremium", next);
+                  }}
                   className={cn(
                     "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full",
                     "text-[11px] uppercase tracking-[0.08em] font-medium font-sans",
                     "transition-colors duration-200 whitespace-nowrap",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    params.isPremium === "true"
+                    localIsPremium === "true"
                       ? "bg-accent text-accent-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                   )}
-                  aria-pressed={params.isPremium === "true"}
+                  aria-pressed={localIsPremium === "true"}
                 >
                   <Crown className="size-3 shrink-0" aria-hidden />
                   Premium only
