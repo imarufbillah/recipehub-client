@@ -6,6 +6,7 @@ import {
   getTotalRecipes,
   getTotalPremiumMembers,
   getTotalReports,
+  getTotalPendingReports,
 } from "@/lib/apiClient.server";
 
 const OverviewPage = async () => {
@@ -24,15 +25,17 @@ const OverviewPage = async () => {
     totalRecipes: 0,
     premiumMembers: 0,
     totalReports: 0,
+    pendingReports: 0,
   };
 
   if (role === "admin") {
-    const [usersRes, recipesRes, premiumRes, reportsRes] =
+    const [usersRes, recipesRes, premiumRes, reportsRes, pendingRes] =
       await Promise.allSettled([
         getTotalUsers(),
         getTotalRecipes(),
         getTotalPremiumMembers(),
         getTotalReports(),
+        getTotalPendingReports(),
       ]);
 
     adminStats = {
@@ -49,6 +52,10 @@ const OverviewPage = async () => {
       totalReports:
         reportsRes.status === "fulfilled"
           ? (reportsRes.value.totalReports ?? 0)
+          : 0,
+      pendingReports:
+        pendingRes.status === "fulfilled"
+          ? (pendingRes.value.totalPendingReports ?? 0)
           : 0,
     };
   }

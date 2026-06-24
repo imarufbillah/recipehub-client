@@ -121,6 +121,7 @@ export const getTotalUsers = () => request("GET", "/users/total");
 export const getTotalRecipes = () => request("GET", "/recipes/total");
 export const getTotalPremiumMembers = () => request("GET", "/users/premium");
 export const getTotalReports = () => request("GET", "/reports/total");
+export const getTotalPendingReports = () => request("GET", "/reports/pending");
 
 // ─── Admin — user management ──────────────────────────────────────────────────
 

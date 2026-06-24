@@ -1,29 +1,13 @@
 import { Users, BookOpen, Crown, Flag } from "lucide-react";
 import StatCard from "./StatCard";
 
-/**
- * Admin overview — 4 stat cards at admin density (dense=true).
- *
- * Admin Mode: tighter padding, smaller numeral scale — admin screens
- * prioritise scanning multiple data points over single-stat impact.
- * Same tokens, same typography families — it must still feel like RecipeHub.
- *
- * Cards: Total Users · Total Recipes · Premium Members · Total Reports
- *
- * Props:
- *  stats — {
- *    totalUsers: number,
- *    totalRecipes: number,
- *    premiumMembers: number,
- *    totalReports: number,
- *  }
- */
 const AdminOverview = ({
   stats = {
-    totalUsers: 3_842,
-    totalRecipes: 12_107,
-    premiumMembers: 924,
-    totalReports: 17,
+    totalUsers: 0,
+    totalRecipes: 0,
+    premiumMembers: 0,
+    totalReports: 0,
+    pendingReports: 0,
   },
 }) => {
   return (
@@ -52,7 +36,7 @@ const AdminOverview = ({
         dense
       />
 
-      {/* Reports — destructive tint signals this needs attention */}
+      {/* Reports — pending count from API signals items needing attention */}
       <StatCard
         label="Total Reports"
         value={stats.totalReports.toLocaleString()}
@@ -60,9 +44,9 @@ const AdminOverview = ({
         iconColor="muted"
         dense
       >
-        {stats.totalReports > 0 && (
+        {stats.pendingReports > 0 && (
           <span className="text-[11px] font-sans text-destructive uppercase tracking-[0.06em] font-medium">
-            {stats.totalReports} pending review
+            {stats.pendingReports} pending review
           </span>
         )}
       </StatCard>
