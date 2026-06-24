@@ -4,30 +4,53 @@ import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 
+/* Badge variants */
 const badgeVariants = cva(
-  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
+  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-sm border border-transparent px-2 py-0.5 text-[11px] font-medium font-sans uppercase tracking-[0.08em] whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 [&>svg]:pointer-events-none [&>svg]:size-3!",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
-        secondary:
-          "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
+        /*
+         * default — primary fill: for status badges that need strong emphasis.
+         * Use sparingly per color discipline rule.
+         */
+        default: "bg-primary text-primary-foreground border-transparent",
+        /*
+         * secondary — warm neutral: general-purpose category/cuisine/tag badges.
+         * Lowest visual weight after outline; safe to use frequently.
+         */
+        secondary: "bg-secondary text-secondary-foreground border-transparent",
+        /*
+         * accent — deep olive: ONLY for "Premium" / "Featured" / success states.
+         * Design system: "Premium or Featured badges may use accent token
+         * sparingly — these are the accent's primary job in the whole system."
+         * bg-accent/10 + text-accent + border-accent/20 keeps it restrained
+         * rather than a full accent fill which would be too heavy.
+         */
+        accent: "bg-accent/10 text-accent border-accent/20",
+        /*
+         * destructive — report/flagged/error labels.
+         */
         destructive:
-          "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
-        outline:
-          "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
-        ghost:
-          "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-destructive/10 text-destructive border-destructive/20 focus-visible:ring-destructive/20 dark:bg-destructive/20",
+        /*
+         * outline — lowest weight; for plain category or taxonomy tags.
+         */
+        outline: "border-border bg-transparent text-muted-foreground",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "secondary",
     },
   },
 );
 
-function Badge({ className, variant = "default", asChild = false, ...props }) {
+const Badge = ({
+  className,
+  variant = "secondary",
+  asChild = false,
+  ...props
+}) => {
   const Comp = asChild ? Slot.Root : "span";
 
   return (
@@ -38,6 +61,6 @@ function Badge({ className, variant = "default", asChild = false, ...props }) {
       {...props}
     />
   );
-}
+};
 
 export { Badge, badgeVariants };

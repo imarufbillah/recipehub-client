@@ -8,8 +8,7 @@ import { cn } from "@/lib/utils";
 
 // ─── Status badge ────────────────────────────────────────────────────────────
 
-// Maps status strings to shadcn Badge className overrides.
-// Badge base: rounded-4xl — override to rounded-sm to match design system pill style.
+// Maps status strings to Badge className overrides.
 const STATUS_STYLES = {
   active:
     "bg-secondary text-secondary-foreground border-transparent rounded-sm",
