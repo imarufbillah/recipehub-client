@@ -35,32 +35,36 @@ const PremiumPageClient = ({ isPremium = false, price = "19.99" }) => {
       }
     });
 
-  return (
+  return isPremium ? (
     /*
-     * Two-column grid on lg+.
+     * Already a member — no sales pitch needed.
+     * Center the confirmation card on its own, full width.
+     */
+    <div className="flex justify-center w-full">
+      <div className="w-full max-w-md">
+        <PremiumAlreadyMember />
+      </div>
+    </div>
+  ) : (
+    /*
+     * Non-premium / unauthenticated — two-column sales layout.
      * 7/12 left, 5/12 right — deliberate asymmetry per design system.
      * Single column on mobile (grid-cols-1).
      */
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start w-full">
-      {/* ── Left column — text content ── */}
+      {/* ── Left column — text content + social proof ── */}
       <div className="lg:col-span-7 flex flex-col gap-12">
         <PremiumPageHeader />
-
-        {/* Social proof strip — only for non-premium visitors */}
-        {!isPremium && <PremiumSocialProof />}
+        <PremiumSocialProof />
       </div>
 
       {/* ── Right column — offer card, sticky on scroll ── */}
       <div className="lg:col-span-5 lg:sticky lg:top-24">
-        {isPremium ? (
-          <PremiumAlreadyMember />
-        ) : (
-          <PremiumOfferCard
-            price={price}
-            onCheckout={handleCheckout}
-            isLoading={isLoading}
-          />
-        )}
+        <PremiumOfferCard
+          price={price}
+          onCheckout={handleCheckout}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );

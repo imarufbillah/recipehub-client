@@ -7,11 +7,15 @@ const links = [
   { href: "/premium", label: "Premium" },
 ];
 
-const NavLinks = ({ pathname = "" }) => {
+const NavLinks = ({ pathname = "", isPremium = false }) => {
+  const visibleLinks = links.filter(
+    ({ href }) => !(href === "/premium" && isPremium),
+  );
+
   return (
     <nav aria-label="Main navigation">
       <ul className="flex items-center gap-6">
-        {links.map(({ href, label }) => {
+        {visibleLinks.map(({ href, label }) => {
           const isActive = pathname === href;
 
           return (

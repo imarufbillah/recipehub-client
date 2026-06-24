@@ -44,6 +44,11 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
   const isAdmin = user?.role === "admin";
   const isPremium = user?.plan === "premium";
 
+  // Filter Premium link out for premium members
+  const visibleNavLinks = navLinks.filter(
+    ({ href }) => !(href === "/premium" && isPremium),
+  );
+
   // Lock body scroll while overlay is open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -180,7 +185,7 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
             >
               <ul className="flex flex-col gap-1">
                 {/* Public nav links — large serif display */}
-                {navLinks.map(({ href, label }, i) => {
+                {visibleNavLinks.map(({ href, label }, i) => {
                   const isActive = pathname === href;
                   return (
                     <motion.li
@@ -221,7 +226,7 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
                       transition={{
                         duration: 0.3,
                         ease: "easeOut",
-                        delay: 0.18 + navLinks.length * 0.07,
+                        delay: 0.18 + visibleNavLinks.length * 0.07,
                       }}
                       className="border-t border-border my-3"
                       aria-hidden="true"
@@ -249,7 +254,8 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
                           transition={{
                             duration: 0.32,
                             ease: "easeOut",
-                            delay: 0.18 + (navLinks.length + 1 + i) * 0.06,
+                            delay:
+                              0.18 + (visibleNavLinks.length + 1 + i) * 0.06,
                           }}
                         >
                           <Link

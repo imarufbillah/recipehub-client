@@ -6,32 +6,28 @@ const CUISINES = [
     slug: "italian",
     name: "Italian",
     recipeCount: 214,
-    image:
-      "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb",
     alt: "Fresh handmade pasta with rich ragù sauce — Italian cuisine",
   },
   {
     slug: "japanese",
     name: "Japanese",
     recipeCount: 178,
-    image:
-      "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80",
+    image: "https://images.unsplash.com/photo-1547592180-85f173990554",
     alt: "Steaming bowl of tonkotsu ramen with chashu pork — Japanese cuisine",
   },
   {
     slug: "middle-eastern",
     name: "Middle Eastern",
     recipeCount: 132,
-    image:
-      "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&w=700&q=80",
+    image: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea",
     alt: "Mezze spread with hummus, flatbread and herbs — Middle Eastern cuisine",
   },
   {
     slug: "french",
     name: "French",
     recipeCount: 156,
-    image:
-      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
     alt: "Classically plated French bistro dish with sauce — French cuisine",
   },
   {
@@ -43,12 +39,11 @@ const CUISINES = [
     alt: "Vibrant tacos with fresh salsa and lime — Mexican cuisine",
   },
   {
-    slug: "indian",
-    name: "Indian",
+    slug: "bengali",
+    name: "Bengali",
     recipeCount: 201,
-    image:
-      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=900&q=80",
-    alt: "Richly spiced curry with basmati rice and naan — Indian cuisine",
+    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe",
+    alt: "Richly spiced curry with basmati rice and naan — Bengali cuisine",
   },
 ];
 

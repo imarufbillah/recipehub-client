@@ -1,12 +1,3 @@
-import { Check } from "lucide-react";
-
-const BENEFIT_HIGHLIGHTS = [
-  "Publish unlimited recipes",
-  "Earn a Premium profile badge",
-  "Purchase any recipe on the platform",
-  "Priority visibility in search",
-];
-
 const PremiumPageHeader = () => {
   return (
     <div className="flex flex-col gap-8">
@@ -15,31 +6,23 @@ const PremiumPageHeader = () => {
         RecipeHub Premium
       </span>
 
-      {/* H1 — Page Title scale, serif, left-aligned */}
+      {/* H1 */}
       <h1 className="font-heading text-[clamp(32px,4.5vw,56px)] leading-none tracking-tight text-foreground max-w-[12ch]">
         Your kitchen, fully unlocked.
       </h1>
 
-      {/* Supporting copy */}
+      {/* Editorial positioning — who this is for, not what it includes */}
       <p className="text-[16px] leading-[1.65] text-muted-foreground font-sans max-w-[38ch]">
-        One subscription. Unlimited publishing, exclusive access, and the tools
-        serious cooks actually need.
+        For cooks who treat the kitchen seriously. One subscription removes
+        every limit — publish freely, build an audience, and access the recipes
+        worth paying for.
       </p>
 
-      {/* Benefit highlights — accent checks, left-aligned teaser */}
-      <ul className="flex flex-col gap-3" aria-label="What you get">
-        {BENEFIT_HIGHLIGHTS.map((item) => (
-          <li key={item} className="flex items-center gap-3">
-            <Check
-              className="size-4 shrink-0 text-accent stroke-[1.75]"
-              aria-hidden
-            />
-            <span className="text-[14px] font-sans text-foreground">
-              {item}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {/* Secondary line — sets expectation without repeating card features */}
+      <p className="text-[15px] leading-[1.65] text-muted-foreground font-sans max-w-[36ch]">
+        No ads. No paywalled tutorials. Just the tools that let your cooking
+        speak for itself.
+      </p>
     </div>
   );
 };

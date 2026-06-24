@@ -111,7 +111,7 @@ const Footer = () => {
                   label: "Middle Eastern",
                 },
                 { href: "/recipes?cuisine=mexican", label: "Mexican" },
-                { href: "/recipes?cuisine=indian", label: "Indian" },
+                { href: "/recipes?cuisine=bengali", label: "Bengali" },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link

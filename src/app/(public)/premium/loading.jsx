@@ -1,6 +1,5 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -25,15 +24,8 @@ const fadeIn = {
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
-const BENEFIT_HIGHLIGHTS = [
-  "Publish unlimited recipes",
-  "Earn a Premium profile badge",
-  "Purchase any recipe on the platform",
-  "Priority visibility in search",
-];
-
 /*
- * Widths mirror actual label character lengths:
+ * Card benefit label widths — 5 entries mirroring real label lengths:
  *   "Unlimited recipe publishing"           → w-48
  *   "Premium profile badge"                 → w-36
  *   "Access to purchase individual recipes" → w-56
@@ -70,29 +62,20 @@ const LeftColumn = () => (
         Your kitchen, fully unlocked.
       </h1>
 
-      {/* Supporting copy */}
+      {/* Two editorial paragraphs — no bullet list (that lives in the card) */}
       <p className="text-[16px] leading-[1.65] text-muted-foreground font-sans max-w-[38ch]">
-        One subscription. Unlimited publishing, exclusive access, and the tools
-        serious cooks actually need.
+        For cooks who treat the kitchen seriously. One subscription removes
+        every limit — publish freely, build an audience, and access the recipes
+        worth paying for.
       </p>
 
-      {/* Benefit highlights — real text, no skeleton */}
-      <ul className="flex flex-col gap-3" aria-label="What you get">
-        {BENEFIT_HIGHLIGHTS.map((item) => (
-          <li key={item} className="flex items-center gap-3">
-            <Check
-              className="size-4 shrink-0 text-accent stroke-[1.75]"
-              aria-hidden
-            />
-            <span className="text-[14px] font-sans text-foreground">
-              {item}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <p className="text-[15px] leading-[1.65] text-muted-foreground font-sans max-w-[36ch]">
+        No ads. No paywalled tutorials. Just the tools that let your cooking
+        speak for itself.
+      </p>
     </div>
 
-    {/* PremiumSocialProof skeleton — same fadeIn delay as real component */}
+    {/* PremiumSocialProof skeleton */}
     <motion.div
       variants={fadeIn}
       initial="hidden"
@@ -111,7 +94,6 @@ const LeftColumn = () => (
               i === SOCIAL_PROOF_COLS.length - 1 && "pr-0",
             )}
           >
-            {/* Quote lines */}
             <div className="flex flex-col gap-1.5 items-center">
               {col.lines.map((w, j) => (
                 <div
@@ -121,7 +103,6 @@ const LeftColumn = () => (
                 />
               ))}
             </div>
-            {/* Avatar + name */}
             <div className="flex items-center gap-2 mt-auto">
               <div className="size-6 rounded-full bg-muted shrink-0 animate-pulse" />
               <div
@@ -156,10 +137,7 @@ const RightColumn = () => (
         "max-sm:px-6 max-sm:py-10",
       )}
     >
-      {/* ── 1. Price block ──
-          Mirrors: flex items-end gap-1 pb-8
-          $ symbol + large numeral + stacked "per month / cancel anytime"
-      */}
+      {/* ── 1. Price block ── */}
       <div className="flex items-end gap-1 pb-8">
         <div className="w-5 h-6 bg-muted rounded-sm animate-pulse self-start mt-3" />
         <div className="w-32 h-20 bg-muted rounded-sm animate-pulse" />
