@@ -1,14 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const CuisineTile = ({
-  slug,
-  name,
-  recipeCount,
-  image,
-  alt,
-  mobile = false,
-}) => {
+const CuisineTile = ({ slug, name, image, alt, mobile = false }) => {
   return (
     <Link
       href={`/recipes?cuisine=${slug}`}
@@ -41,13 +34,10 @@ const CuisineTile = ({
         style={{ background: "oklch(0.1 0.01 50 / 0.25)" }}
       />
 
-      {/* ── Text — bottom-left, serif name + muted recipe count ── */}
+      {/* ── Text — bottom-left, serif name only ── */}
       <div className="absolute bottom-0 left-0 p-5 z-10">
         <p className="font-heading text-[clamp(20px,2.2vw,28px)] leading-tight tracking-[-0.02em] text-white">
           {name}
-        </p>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.08em] font-medium font-sans text-white/60">
-          {recipeCount} recipes
         </p>
       </div>
     </Link>
