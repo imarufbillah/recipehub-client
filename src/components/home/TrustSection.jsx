@@ -80,7 +80,9 @@ const TrustSection = () => {
             <br />
             better than a
             <br />
-            <span className="text-primary">five-star blog post.</span>
+            <span className="text-accent dark:text-primary">
+              five-star blog post.
+            </span>
           </motion.h2>
 
           {/* Ruled line — editorial texture, desktop only */}
@@ -109,7 +111,7 @@ const TrustSection = () => {
                * sans for short declarative phrases. Primary color on the stat
                * only — one accent moment per proof point, max.
                */}
-              <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-primary mb-3">
+              <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-accent dark:text-primary mb-3">
                 {stat}
               </p>
 
