@@ -13,22 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-/**
- * Report modal — now uses shadcn Dialog, RadioGroup, Textarea, Label.
- *
- * Dialog handles: portal, overlay scrim, focus-trap, Escape-to-close,
- * body scroll lock, and the close button — all removed from hand-rolled code.
- *
- * RadioGroup handles: accessible radio semantics, keyboard navigation,
- * data-checked state — custom dot indicators preserved via className.
- *
- * Design system constraints maintained:
- *  - Serif modal title (font-heading).
- *  - Radio selected state: primary-token outline dot (not a heavy color box).
- *  - Textarea: border-input, radius-md, ring on focus.
- *  - Ghost cancel + primary submit.
- */
-
 const REPORT_REASONS = [
   { id: "spam", label: "Spam or self-promotion" },
   { id: "offensive", label: "Offensive or harmful content" },
@@ -41,12 +25,18 @@ const ReportModal = ({ open, onClose, onSubmit, initialReported = false }) => {
   const [reason, setReason] = useState("");
   const [detail, setDetail] = useState("");
   const [submitted, setSubmitted] = useState(initialReported);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!reason) return;
-    await onSubmit?.(reason, detail);
-    setSubmitted(true);
+    if (!reason || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onSubmit?.(reason, detail);
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleOpenChange = (isOpen) => {
@@ -70,7 +60,7 @@ const ReportModal = ({ open, onClose, onSubmit, initialReported = false }) => {
        */}
       <DialogContent
         className="rounded-xl px-7 py-8 sm:max-w-md gap-0"
-        showCloseButton={!submitted}
+        showCloseButton={!submitted && !isSubmitting}
       >
         <DialogHeader className="mb-7">
           <DialogTitle className="font-heading text-[22px] leading-snug tracking-[-0.01em] text-card-foreground">
@@ -160,6 +150,7 @@ const ReportModal = ({ open, onClose, onSubmit, initialReported = false }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleOpenChange(false)}
+                disabled={isSubmitting}
                 className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0"
               >
                 Cancel
@@ -168,10 +159,10 @@ const ReportModal = ({ open, onClose, onSubmit, initialReported = false }) => {
                 type="submit"
                 variant="default"
                 size="sm"
-                disabled={!reason}
+                disabled={!reason || isSubmitting}
                 className="px-5 font-sans text-[13px] font-medium"
               >
-                Submit Report
+                {isSubmitting ? "Submitting…" : "Submit Report"}
               </Button>
             </div>
           </form>

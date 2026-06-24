@@ -1,38 +1,36 @@
-import Image from "next/image";
+"use client";
 
-/**
- * Recipe Detail Hero — asymmetric 55/45 split, committed editorial pattern.
- *
- * Left 55%: large food photograph, absolutely positioned, bleeds full viewport
- * height of the section with sharp corners. No rounding on the image itself —
- * architectural/editorial feel.
- *
- * Right 45%: reserved for the title block and action row (rendered as children
- * or as a sibling in the page — this component handles the image panel only,
- * keeping concerns separated and each component a server component).
- *
- * On mobile: image stacks above content, full-width, 3:2 aspect ratio,
- * sharp corners maintained.
- *
- * Props:
- *  image    — image URL
- *  alt      — image alt text
- *  priority — boolean, true for LCP (default true on detail page)
- */
+import { useState } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+
 const RecipeDetailHero = ({ image, alt, priority = true }) => {
+  const [loaded, setLoaded] = useState(false);
+
   return (
     <>
       {/* ── Desktop: absolute left panel that bleeds full section height ── */}
-      {/* The parent section in the page manages the 55/45 layout via CSS grid */}
-      {/* This component is the image panel only */}
       <div className="hidden lg:block relative w-full h-full min-h-150 overflow-hidden">
+        {/* Skeleton shown until image paints */}
+        <div
+          className={cn(
+            "absolute inset-0 bg-muted animate-pulse transition-opacity duration-300",
+            loaded ? "opacity-0 pointer-events-none" : "opacity-100",
+          )}
+          aria-hidden
+        />
+
         <Image
           src={image}
           alt={alt}
           fill
           priority={priority}
           sizes="55vw"
-          className="object-cover object-center"
+          className={cn(
+            "object-cover object-center transition-opacity duration-500",
+            loaded ? "opacity-100" : "opacity-0",
+          )}
+          onLoad={() => setLoaded(true)}
         />
 
         {/* Subtle right-edge gradient — blends image into page background */}
@@ -48,13 +46,26 @@ const RecipeDetailHero = ({ image, alt, priority = true }) => {
 
       {/* ── Mobile: full-width stacked image, 3:2 aspect, sharp corners ── */}
       <div className="lg:hidden w-full aspect-3/2 relative overflow-hidden">
+        {/* Skeleton shown until image paints */}
+        <div
+          className={cn(
+            "absolute inset-0 bg-muted animate-pulse transition-opacity duration-300",
+            loaded ? "opacity-0 pointer-events-none" : "opacity-100",
+          )}
+          aria-hidden
+        />
+
         <Image
           src={image}
           alt={alt}
           fill
           priority={priority}
           sizes="100vw"
-          className="object-cover object-center"
+          className={cn(
+            "object-cover object-center transition-opacity duration-500",
+            loaded ? "opacity-100" : "opacity-0",
+          )}
+          onLoad={() => setLoaded(true)}
         />
       </div>
     </>

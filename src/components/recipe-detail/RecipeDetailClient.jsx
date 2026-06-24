@@ -18,6 +18,8 @@ const RecipeDetailClient = ({
   initialReported = false,
   isPremium,
   isPurchased,
+  isOwner = false,
+  isAdmin = false,
   price,
 }) => {
   const [reportOpen, setReportOpen] = useState(false);
@@ -52,6 +54,8 @@ const RecipeDetailClient = ({
         initialFavorited={initialFavorited}
         isPremium={isPremium}
         isPurchased={isPurchased}
+        isOwner={isOwner}
+        isAdmin={isAdmin}
         price={price}
         onReport={handleReport}
         userId={userId}

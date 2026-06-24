@@ -33,6 +33,8 @@ const RecipeActionRow = ({
   initialFavorited = false,
   isPremium = false,
   isPurchased = false,
+  isOwner = false,
+  isAdmin = false,
   price = "$4.99",
   onReport,
   onPurchase,
@@ -79,8 +81,20 @@ const RecipeActionRow = ({
       }
     });
 
-  const showPurchaseButton = isPremium && !isPurchased;
-  const showConfirmationChip = !isPremium || isPurchased;
+  // Owner and admin have implicit access — content is unlocked without purchase.
+  const hasImplicitAccess = isOwner || isAdmin;
+
+  // Regular users: show the primary unlock button when premium + not yet purchased
+  const showPurchaseButton = isPremium && !isPurchased && !hasImplicitAccess;
+
+  // Owner/admin: show a price-only badge (they have access, but price is informational)
+  const showOptionalPurchase = isPremium && hasImplicitAccess;
+
+  // Show "Purchased" chip only for regular users who actually bought it
+  const showPurchasedChip = isPremium && isPurchased && !hasImplicitAccess;
+
+  // Show "Free Recipe" chip for non-premium recipes (regardless of role)
+  const showFreeChip = !isPremium;
 
   return (
     <div className="flex items-center justify-between gap-4 py-5 border-y border-border">
@@ -148,8 +162,8 @@ const RecipeActionRow = ({
 
       {/* ── Right: report + purchase ── */}
       <div className="flex items-center gap-3">
-        {/* Report — visually quieter than engagement actions */}
-        {onReport && (
+        {/* Report — hidden for recipe owner and admin */}
+        {onReport && !hasImplicitAccess && (
           <button
             type="button"
             onClick={onReport}
@@ -207,7 +221,20 @@ const RecipeActionRow = ({
                 {checkoutLoading ? "Redirecting…" : `Unlock Recipe — ${price}`}
               </Button>
             </motion.div>
-          ) : showConfirmationChip ? (
+          ) : showOptionalPurchase ? (
+            <motion.div
+              key="optional-purchase"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              {/* Price display only — owner/admin can see the price but don't need to purchase */}
+              <Badge className="bg-secondary text-secondary-foreground border-transparent rounded-md text-[11px] uppercase tracking-[0.06em] font-medium font-sans h-auto px-3 py-1.5 gap-1.5">
+                {price}
+              </Badge>
+            </motion.div>
+          ) : showPurchasedChip ? (
             <motion.div
               key="unlocked"
               initial={{ opacity: 0, y: 4 }}
@@ -215,10 +242,22 @@ const RecipeActionRow = ({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              {/* Quiet confirmation chip — Badge secondary, no dominant visual weight */}
               <Badge className="bg-secondary text-secondary-foreground border-transparent rounded-md text-[11px] uppercase tracking-[0.06em] font-medium font-sans h-auto px-3 py-1.5 gap-1.5">
                 <Check className="size-3 shrink-0" aria-hidden />
-                {isPremium ? "Purchased" : "Free Recipe"}
+                Purchased
+              </Badge>
+            </motion.div>
+          ) : showFreeChip ? (
+            <motion.div
+              key="free"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <Badge className="bg-secondary text-secondary-foreground border-transparent rounded-md text-[11px] uppercase tracking-[0.06em] font-medium font-sans h-auto px-3 py-1.5 gap-1.5">
+                <Check className="size-3 shrink-0" aria-hidden />
+                Free Recipe
               </Badge>
             </motion.div>
           ) : null}

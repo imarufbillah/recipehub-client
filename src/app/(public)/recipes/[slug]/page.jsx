@@ -10,6 +10,7 @@ import {
   getFavoriteStatus,
   getReportStatus,
   getPurchaseStatus,
+  checkRecipeOwnership,
 } from "@/lib/apiClient.server";
 import { auth } from "@/lib/auth";
 
@@ -61,14 +62,25 @@ const RecipeDetailPage = async ({ params }) => {
   const userId = session?.user?.id ?? null;
 
   // Only fetch like/favorite/report/purchase status when there's a logged-in user
-  const [initialLiked, initialFavorited, initialReported, isPurchased] = userId
+  const [
+    initialLiked,
+    initialFavorited,
+    initialReported,
+    isPurchased,
+    isOwner,
+  ] = userId
     ? await Promise.all([
         getLikeStatus({ userId, recipeId: recipe.id }).catch(() => false),
         getFavoriteStatus({ userId, recipeId: recipe.id }).catch(() => false),
         getReportStatus({ userId, recipeId: recipe.id }).catch(() => false),
         getPurchaseStatus({ userId, recipeId: recipe.id }).catch(() => false),
+        checkRecipeOwnership(recipe.id).catch(() => false),
       ])
-    : [false, false, false, false];
+    : [false, false, false, false, false];
+
+  // Admins always have full access regardless of ownership or purchase
+  const isAdmin = session?.user?.role === "admin";
+  const hasFullAccess = isOwner || isAdmin || isPurchased;
 
   return (
     <>
@@ -111,7 +123,9 @@ const RecipeDetailPage = async ({ params }) => {
                     initialFavorited={initialFavorited}
                     initialReported={initialReported}
                     isPremium={recipe.isPremium}
-                    isPurchased={isPurchased}
+                    isPurchased={hasFullAccess}
+                    isOwner={isOwner}
+                    isAdmin={isAdmin}
                     price={recipe.price}
                   />
                 </div>
@@ -147,7 +161,9 @@ const RecipeDetailPage = async ({ params }) => {
                   initialFavorited={initialFavorited}
                   initialReported={initialReported}
                   isPremium={recipe.isPremium}
-                  isPurchased={isPurchased}
+                  isPurchased={hasFullAccess}
+                  isOwner={isOwner}
+                  isAdmin={isAdmin}
                   price={recipe.price}
                 />
               </div>
@@ -168,7 +184,7 @@ const RecipeDetailPage = async ({ params }) => {
         ingredientGroups={recipe.ingredientGroups}
         steps={recipe.steps}
         isPremium={recipe.isPremium}
-        isPurchased={isPurchased}
+        isPurchased={hasFullAccess}
         recipeId={recipe.id}
         recipeName={recipe.name}
         recipeSlug={recipe.slug}

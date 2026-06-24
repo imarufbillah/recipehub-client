@@ -107,6 +107,9 @@ export const getPurchaseStatus = ({ userId, recipeId }) =>
 export const getPurchasesByUserId = (userId) =>
   request("GET", `/purchases/user/${userId}`);
 
+export const checkRecipeOwnership = (recipeId) =>
+  request("GET", `/recipes/check-ownership/${recipeId}`);
+
 // ─── Subscriptions ────────────────────────────────────────────────────────────
 
 export const createSubscription = (data) =>
