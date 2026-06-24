@@ -21,9 +21,9 @@ import {
   EditImageDropZone,
   IngredientsRepeater,
   StepsRepeater,
+  CategoryCombobox,
   emptyIngredient,
   emptyStep,
-  CATEGORIES,
   DIFFICULTIES,
 } from "@/components/dashboard/recipeFormParts";
 import { updateRecipe } from "@/lib/apiClient.client";
@@ -186,22 +186,11 @@ const EditRecipeForm = ({
 
             <div className="grid grid-cols-2 gap-4">
               <Field id="recipe-category" label="Category">
-                <Select
+                <CategoryCombobox
+                  id="recipe-category"
                   value={category}
-                  onValueChange={markDirty(setCategory)}
-                  required
-                >
-                  <SelectTrigger id="recipe-category" className="w-full">
-                    <SelectValue placeholder="Select category…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={markDirty(setCategory)}
+                />
               </Field>
               <Field id="recipe-cuisine" label="Cuisine">
                 <Input

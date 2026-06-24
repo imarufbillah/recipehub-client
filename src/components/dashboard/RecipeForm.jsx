@@ -21,9 +21,9 @@ import {
   ImageDropZone,
   IngredientsRepeater,
   StepsRepeater,
+  CategoryCombobox,
   emptyIngredient,
   emptyStep,
-  CATEGORIES,
   DIFFICULTIES,
 } from "@/components/dashboard/recipeFormParts";
 
@@ -185,18 +185,11 @@ const RecipeForm = ({ user, initialData }) => {
 
             <div className="grid grid-cols-2 gap-4">
               <Field id="recipe-category" label="Category">
-                <Select value={category} onValueChange={setCategory} required>
-                  <SelectTrigger id="recipe-category" className="w-full">
-                    <SelectValue placeholder="Select category…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CategoryCombobox
+                  id="recipe-category"
+                  value={category}
+                  onChange={setCategory}
+                />
               </Field>
               <Field id="recipe-cuisine" label="Cuisine">
                 <Input
