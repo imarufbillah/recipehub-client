@@ -19,7 +19,7 @@ const cardVariants = {
 
 const FeaturedRecipesGrid = ({ recipes }) => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.15 });
+  const inView = useInView(ref, { once: true, amount: 0 });
 
   return (
     <div

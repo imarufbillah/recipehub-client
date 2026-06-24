@@ -27,7 +27,7 @@ const cardVariants = {
 
 const PopularRecipesGrid = ({ recipes }) => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.12 });
+  const inView = useInView(ref, { once: true, amount: 0 });
 
   return (
     <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 gap-3">

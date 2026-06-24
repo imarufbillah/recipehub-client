@@ -22,7 +22,7 @@ const GRID_STYLE = {
 
 const CuisineGrid = ({ cuisines }) => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.1 });
+  const inView = useInView(ref, { once: true, amount: 0 });
 
   return (
     <div ref={ref}>

@@ -277,11 +277,11 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
 
             {/* ── Bottom bar ── */}
             <div className="px-8 pb-10 pt-6 border-t border-border flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <ThemeToggle />
+              <div className="flex items-center justify-between">
                 <span className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground font-medium">
-                  Toggle theme
+                  Change Theme
                 </span>
+                <ThemeToggle />
               </div>
 
               {!isPending &&
@@ -301,7 +301,7 @@ const MobileMenu = ({ pathname = "", user = null, isPending = false }) => {
                     <Button
                       variant="ghost"
                       asChild
-                      className="justify-start px-0 text-sm text-foreground hover:text-primary w-fit"
+                      className="w-full"
                       onClick={close}
                     >
                       <Link href="/login">Login</Link>

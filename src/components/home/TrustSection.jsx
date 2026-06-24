@@ -12,21 +12,6 @@ const fadeUp = {
   }),
 };
 
-/**
- * Trust / Value section — magazine pull-quote treatment.
- *
- * Layout: asymmetric 7/5 split on desktop.
- *  Left (7 cols) — one large display-scale serif statement, anchored top.
- *  Right (5 cols) — 3 proof points stacked vertically, hairline rule
- *                   separating each, sans body copy.
- *
- * Deliberately avoids:
- *  - Icons (generic SaaS tell)
- *  - Equal-width 3-column grid (template tell)
- *  - Centered layout (kills editorial confidence)
- *  - Headers on proof points (keeps hierarchy clean — the statement IS the headline)
- */
-
 const PROOF_POINTS = [
   {
     stat: "12,000+",
@@ -44,7 +29,7 @@ const PROOF_POINTS = [
 
 const TrustSection = () => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
+  const inView = useInView(ref, { once: true, amount: 0 });
 
   return (
     <section className="w-full py-28 lg:py-40 bg-foreground">
