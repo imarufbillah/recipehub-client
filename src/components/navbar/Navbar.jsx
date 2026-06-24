@@ -8,31 +8,14 @@ import NavLinks from "./NavLinks";
 import ThemeToggle from "./ThemeToggle";
 import MobileMenu from "./MobileMenu";
 import UserMenu from "./UserMenu";
+import UserMenuSkeleton from "./UserMenuSkeleton";
 import { Button } from "@/components/ui/button";
 import { useClientSession } from "@/hooks/useClientSession";
 
-/**
- * Sticky navbar — transparent over the hero, gains card background + hairline
- * border after scrolling past 80px. Designed once, rendered on all public pages
- * via the (public) layout.
- *
- * Desktop: logo left | nav links center | theme + auth right
- * Mobile:  logo left | hamburger right  (full-screen overlay handled by MobileMenu)
- */
 const Navbar = () => {
   const scrolled = useScrolled(80);
   const pathname = usePathname();
   const { user, isPending } = useClientSession();
-  //  user data structure for example
-  //   {
-  //     "name": "Inspector",
-  //     "email": "admin@recipehub.com",
-  //     "emailVerified": false,
-  //     "image": "https://img.icons8.com/fluent/1200/microsoft-admin.jpg",
-  //     "createdAt": "2026-06-18T09:06:46.440Z",
-  //     "updatedAt": "2026-06-18T09:06:46.440Z",
-  //     "id": "6a33b526c8e7e9cc557dcb62"
-  // }
 
   return (
     <header
@@ -61,7 +44,9 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <ThemeToggle />
 
-          {isPending ? null : user ? (
+          {isPending ? (
+            <UserMenuSkeleton />
+          ) : user ? (
             /* Authenticated — user menu trigger + dropdown */
             <UserMenu user={user} />
           ) : (

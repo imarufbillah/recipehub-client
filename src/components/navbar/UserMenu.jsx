@@ -5,18 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import UserMenuTrigger from "./UserMenuTrigger";
 import UserMenuDropdown from "./UserMenuDropdown";
 
-/**
- * UserMenu — orchestrator component (desktop only).
- *
- * Manages open/close state and wires trigger + dropdown together.
- *
- * Motion spec (Design System):
- *  - Opens: fade + 6px downward translate, 175ms ease-out
- *  - Closes: fade + 6px upward translate, 150ms ease-out
- *  - No bounce, no spring, no overshoot
- *
- * Dismissal: outside click, item selection, or Escape key.
- */
 const UserMenu = ({ user }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
