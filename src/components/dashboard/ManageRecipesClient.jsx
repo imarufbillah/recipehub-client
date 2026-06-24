@@ -73,8 +73,8 @@ const ManageRecipesClient = ({ initialRows, totalPages, currentPage }) => {
         prev.map((r) => (r.id === row.id ? { ...r, isFeatured: next } : r)),
       );
       refresh();
-    } catch {
-      toast.error("Action failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Action failed. Please try again.");
     }
   };
 
@@ -88,8 +88,8 @@ const ManageRecipesClient = ({ initialRows, totalPages, currentPage }) => {
       setRows((prev) => prev.filter((r) => r.id !== deleteTarget.id));
       setDeleteTarget(null);
       refresh();
-    } catch {
-      toast.error("Delete failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Delete failed. Please try again.");
     } finally {
       setIsDeleting(false);
     }

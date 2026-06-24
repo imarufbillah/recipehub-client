@@ -27,13 +27,14 @@ const DeleteRecipeModal = ({
 
   const handleDelete = () => {
     startDelete(async () => {
-      toast.promise(await deleteRecipe(recipeId), {
-        loading: "Deleting recipe…",
-        success: "Recipe deleted.",
-        error: (err) => err?.message ?? "Could not delete the recipe.",
-      });
-      onDeleted?.(recipeId);
-      onClose();
+      try {
+        await deleteRecipe(recipeId);
+        toast.success("Recipe deleted.");
+        onDeleted?.(recipeId);
+        onClose();
+      } catch (err) {
+        toast.error(err?.message ?? "Could not delete the recipe.");
+      }
     });
   };
 

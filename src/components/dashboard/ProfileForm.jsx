@@ -55,8 +55,8 @@ const ProfileForm = ({ user }) => {
       const url = await uploadToImgbb(file);
       setImage(url);
       toast.success("Image uploaded.");
-    } catch {
-      toast.error("Upload failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Upload failed. Please try again.");
     } finally {
       setIsUploading(false);
       // Reset so the same file can be re-selected if needed

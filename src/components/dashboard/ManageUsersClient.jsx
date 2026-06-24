@@ -54,8 +54,8 @@ const ManageUsersClient = ({ initialRows, totalPages, currentPage }) => {
         ),
       );
       refresh();
-    } catch {
-      toast.error("Action failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Action failed. Please try again.");
     }
   };
 
@@ -68,8 +68,8 @@ const ManageUsersClient = ({ initialRows, totalPages, currentPage }) => {
       setRows((prev) => prev.filter((r) => r.id !== deleteTarget.id));
       setDeleteTarget(null);
       refresh();
-    } catch {
-      toast.error("Delete failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Delete failed. Please try again.");
     } finally {
       setIsDeleting(false);
     }

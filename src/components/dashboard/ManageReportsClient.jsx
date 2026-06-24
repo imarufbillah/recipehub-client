@@ -49,8 +49,8 @@ const ManageReportsClient = ({ initialRows, totalPages, currentPage }) => {
       );
       closeModal();
       refresh();
-    } catch {
-      toast.error("Action failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Action failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,8 +67,8 @@ const ManageReportsClient = ({ initialRows, totalPages, currentPage }) => {
       );
       closeModal();
       refresh();
-    } catch {
-      toast.error("Action failed. Please try again.");
+    } catch (err) {
+      toast.error(err?.message ?? "Action failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

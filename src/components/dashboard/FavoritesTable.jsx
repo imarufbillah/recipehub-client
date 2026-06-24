@@ -28,7 +28,7 @@ const FavoritesTable = ({ rows: initialRows, userId }) => {
     try {
       await removeFromFavorites({ userId, recipeId: row.id });
       toast.success(`Removed "${row.recipeName}" from favorites.`);
-    } catch {
+    } catch (err) {
       // Restore on failure
       setRows((prev) => {
         // Re-insert at original position if possible, otherwise append
@@ -37,7 +37,9 @@ const FavoritesTable = ({ rows: initialRows, userId }) => {
         next.splice(idx, 0, row);
         return next;
       });
-      toast.error("Couldn't remove favorite. Please try again.");
+      toast.error(
+        err?.message ?? "Couldn't remove favorite. Please try again.",
+      );
     }
   };
 

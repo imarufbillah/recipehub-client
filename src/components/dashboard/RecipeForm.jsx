@@ -129,15 +129,12 @@ const RecipeForm = ({ user, initialData }) => {
 
     startSubmit(async () => {
       try {
-        toast.promise(await createRecipe(payload), {
-          loading: "Publishing recipe…",
-          success: "Recipe published.",
-          error: (err) => err?.message ?? "Something went wrong.",
-        });
+        await createRecipe(payload);
+        toast.success("Recipe published.");
         resetForm();
         router.push("/dashboard/my-recipes");
-      } catch {
-        // Error already surfaced by toast.promise above — no double-toast needed
+      } catch (err) {
+        toast.error(err?.message ?? "Something went wrong.");
       }
     });
   };
