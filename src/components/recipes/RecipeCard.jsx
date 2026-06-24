@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Clock, Heart, Users, ArrowRight, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ImageWithSkeleton from "@/components/ui/ImageWithSkeleton";
 
 const RecipeCard = ({
   id,
@@ -26,7 +26,7 @@ const RecipeCard = ({
     >
       {/* ── Image — 3:2 aspect ratio ── */}
       <div className="relative w-full aspect-3/2 shrink-0 overflow-hidden">
-        <Image
+        <ImageWithSkeleton
           src={image}
           alt={alt}
           fill

@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ImageWithSkeleton from "@/components/ui/ImageWithSkeleton";
 
 /**
  * Popular recipe card — compact, list-like anatomy.
@@ -42,7 +42,7 @@ const PopularRecipeCard = ({
     >
       {/* ── Thumbnail — fixed square, sharp corners ── */}
       <div className="relative shrink-0 w-18 h-18 overflow-hidden rounded-sm">
-        <Image
+        <ImageWithSkeleton
           src={image}
           alt={alt}
           fill

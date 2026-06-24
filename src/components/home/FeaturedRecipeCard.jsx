@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Clock, Heart, ArrowRight, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ImageWithSkeleton from "@/components/ui/ImageWithSkeleton";
 
 const FeaturedRecipeCard = ({
   id,
@@ -28,7 +28,7 @@ const FeaturedRecipeCard = ({
         className="relative w-full shrink-0"
         style={{ paddingBottom: "70%" }}
       >
-        <Image
+        <ImageWithSkeleton
           src={image}
           alt={alt}
           fill
