@@ -37,7 +37,11 @@ const Navbar = () => {
 
         {/* ── Desktop nav links (center / right) ── */}
         <div className="hidden md:flex flex-1 items-center justify-center">
-          <NavLinks pathname={pathname} isPremium={user?.plan === "premium"} />
+          <NavLinks
+            pathname={pathname}
+            isPremium={user?.plan === "premium"}
+            isPending={isPending}
+          />
         </div>
 
         {/* ── Desktop: theme toggle + auth ── */}

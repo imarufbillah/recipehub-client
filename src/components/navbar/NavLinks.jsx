@@ -7,7 +7,7 @@ const links = [
   { href: "/premium", label: "Premium" },
 ];
 
-const NavLinks = ({ pathname = "", isPremium = false }) => {
+const NavLinks = ({ pathname = "", isPremium = false, isPending = false }) => {
   const visibleLinks = links.filter(
     ({ href }) => !(href === "/premium" && isPremium),
   );
@@ -17,6 +17,16 @@ const NavLinks = ({ pathname = "", isPremium = false }) => {
       <ul className="flex items-center gap-6">
         {visibleLinks.map(({ href, label }) => {
           const isActive = pathname === href;
+          const isDynamicPremium = href === "/premium";
+
+          // Placeholder for dynamic premium link
+          if (isDynamicPremium && isPending) {
+            return (
+              <li key={href} aria-hidden="true">
+                <span className="block h-3 w-14 rounded-sm bg-muted animate-pulse" />
+              </li>
+            );
+          }
 
           return (
             <li key={href}>
