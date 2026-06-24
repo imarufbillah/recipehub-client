@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useTransition } from "react";
+import { useCallback, useRef, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import AdvancedFilterBar from "./AdvancedFilterBar";
 import RecipeGrid from "./RecipeGrid";
@@ -21,6 +21,18 @@ const BrowseRecipesContent = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+
+  /*
+   * Track the count of the last visible result set so the skeleton mirrors
+   * it during a pending transition — e.g. if the current page shows 7 cards,
+   * the skeleton shows 7 cards, not a fixed 12.
+   * Initialised to recipes.length on mount; updated after each settled render.
+   */
+  const prevCountRef = useRef(recipes.length);
+  if (!isPending) {
+    prevCountRef.current = recipes.length;
+  }
+  const skeletonCount = prevCountRef.current || 12;
 
   // Merge a partial update into the current URL params and navigate.
   // Arrays are joined as comma-separated strings for the URL.
@@ -93,16 +105,8 @@ const BrowseRecipesContent = ({
 
       {/* ── Main content ── */}
       <section className="mx-auto max-w-360 px-6 md:px-10 lg:px-16 py-10 lg:py-14">
-        {/* Results meta line */}
-        {!isEmpty && !isPending && (
-          <p className="text-[13px] font-sans text-muted-foreground mb-6 uppercase tracking-wider">
-            {total.toLocaleString()} {total === 1 ? "recipe" : "recipes"}
-            {hasFilters ? " found" : ""}
-          </p>
-        )}
-
         {isPending ? (
-          <RecipeGridSkeleton count={12} />
+          <RecipeGridSkeleton count={skeletonCount} />
         ) : isEmpty ? (
           <RecipesEmptyState
             onClearFilters={hasFilters ? handleClearAll : undefined}
