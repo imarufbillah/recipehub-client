@@ -1,15 +1,19 @@
 import DashboardTableSkeleton from "@/components/dashboard/DashboardTableSkeleton";
 
 /**
- * Purchased — table skeleton.
+ * Purchased — heading and subtitle are static.
+ * Only the table rows are API-fetched.
  * Columns: Recipe | Author | Price | Date | Ref (mono) + Actions
- * Ref column is wider (mono transaction ID).
  */
 const PurchasedLoading = () => (
   <div className="px-5 md:px-8 py-8">
     <div className="mb-6">
-      <div className="h-3.5 w-24 bg-muted rounded-sm animate-pulse" />
-      <div className="h-3 w-44 bg-muted/60 rounded-sm animate-pulse mt-2" />
+      <h2 className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]">
+        Purchased
+      </h2>
+      <p className="mt-1 text-[13px] font-sans text-muted-foreground">
+        Premium recipes you&apos;ve unlocked.
+      </p>
     </div>
 
     <DashboardTableSkeleton colCount={5} rowCount={8} hasActions />

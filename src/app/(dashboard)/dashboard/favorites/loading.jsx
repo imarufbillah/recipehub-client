@@ -1,14 +1,19 @@
 import DashboardTableSkeleton from "@/components/dashboard/DashboardTableSkeleton";
 
 /**
- * Favorites — table skeleton.
+ * Favorites — heading and subtitle are static.
+ * Only the table rows are API-fetched.
  * Columns: Recipe | Author | Category | Saved | Plan + Actions
  */
 const FavoritesLoading = () => (
   <div className="px-5 md:px-8 py-8">
     <div className="mb-6">
-      <div className="h-3.5 w-20 bg-muted rounded-sm animate-pulse" />
-      <div className="h-3 w-40 bg-muted/60 rounded-sm animate-pulse mt-2" />
+      <h2 className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]">
+        Favorites
+      </h2>
+      <p className="mt-1 text-[13px] font-sans text-muted-foreground">
+        Recipes you&apos;ve saved for later.
+      </p>
     </div>
 
     <DashboardTableSkeleton colCount={5} rowCount={8} hasActions />

@@ -1,22 +1,29 @@
 import Skeleton from "@/components/ui/Skeleton";
 
+/**
+ * Profile — heading, subtitle, section label, and all field labels are static.
+ * Dynamic (API/session): avatar image, displayed name, role badge, and input values.
+ */
 const ProfileLoading = () => (
-  <div className="px-5 md:px-8 py-8 flex flex-col items-center animate-pulse">
+  <div className="px-5 md:px-8 py-8 flex flex-col items-center">
     <div className="w-full max-w-xl">
       {/* Static page heading */}
       <div className="mb-8">
-        <Skeleton className="h-3.5 w-16" />
-        <Skeleton className="h-3 w-56 mt-2" />
+        <h2 className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]">
+          Profile
+        </h2>
+        <p className="mt-1 text-[13px] font-sans text-muted-foreground">
+          Manage your public profile and account settings.
+        </p>
       </div>
 
-      {/* ── Public Profile section ── */}
-      <div className="flex flex-col gap-6">
-        {/* Section label */}
-        <div className="flex items-center justify-between pb-2 border-b border-border">
-          <Skeleton className="h-2.5 w-24" />
-        </div>
+      <div className="flex flex-col gap-6 animate-pulse">
+        {/* Static section label */}
+        <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
+          Public Profile
+        </p>
 
-        {/* Avatar + name block */}
+        {/* Avatar + name — dynamic (session data) */}
         <div className="flex items-center gap-4">
           <Skeleton className="size-14 rounded-full shrink-0" />
           <div className="flex flex-col gap-2">
@@ -26,29 +33,42 @@ const ProfileLoading = () => (
           </div>
         </div>
 
-        {/* Display Name field */}
+        {/* Display Name field — label static, input value dynamic */}
         <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-2.5 w-24" />
+          <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+            Display Name
+          </p>
           <Skeleton className="h-9 w-full rounded-md" />
         </div>
 
-        {/* Email field */}
+        {/* Email field — label static, value dynamic */}
         <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-2.5 w-10" />
+          <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+            Email
+          </p>
           <Skeleton className="h-9 w-full rounded-md" />
-          <Skeleton className="h-2.5 w-56" />
+          <p className="text-[11px] font-sans text-muted-foreground/70">
+            Email cannot be changed here. Contact support if needed.
+          </p>
         </div>
 
-        {/* Bio textarea */}
+        {/* Bio textarea — label static, value dynamic */}
         <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-2.5 w-8" />
+          <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+            Bio
+            <span className="ml-1.5 text-muted-foreground normal-case tracking-normal font-normal">
+              (optional)
+            </span>
+          </p>
           <Skeleton className="h-20 w-full rounded-md" />
         </div>
 
         {/* Save button row */}
         <div className="flex justify-between items-center pt-2 border-t border-border gap-4">
-          <Skeleton className="h-3 w-56 hidden sm:block" />
-          <Skeleton className="h-8 w-full sm:w-28 rounded-md" />
+          <p className="text-[12px] font-sans text-muted-foreground hidden sm:block">
+            Changes are visible to other users immediately.
+          </p>
+          <Skeleton className="h-8 w-full sm:w-28 rounded-md shrink-0" />
         </div>
       </div>
     </div>

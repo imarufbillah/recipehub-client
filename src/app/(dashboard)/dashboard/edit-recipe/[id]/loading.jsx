@@ -1,59 +1,103 @@
 import Skeleton from "@/components/ui/Skeleton";
 
 /**
- * Edit Recipe page skeleton.
- * Same form shape as Add Recipe, but the page header has a "Cancel" ghost
- * link on the right and the subtitle shows the recipe name (API-fetched).
+ * Edit Recipe skeleton — mirrors EditRecipeForm's two-column xl:grid-cols-2 layout.
+ * Left column:  Basic Information + Recipe Photo
+ * Right column: Access & Pricing + Ingredients + Instructions
+ * Footer:       "Unsaved changes" hint + Cancel + Save Changes button
+ *
+ * Static:  "Edit Recipe" heading, Cancel text, all section labels, all field labels,
+ *          ingredient column headers, footer helper text
+ * Dynamic: recipe name in subtitle (API-fetched), all input values pre-filled from recipe
  */
-const EditRecipeFormSkeleton = () => (
-  <div className="flex flex-col gap-8 max-w-2xl animate-pulse">
+
+// ── Left column ───────────────────────────────────────────────────────────────
+const LeftColumnSkeleton = () => (
+  <div className="flex flex-col gap-8">
     {/* Basic Information */}
     <section className="flex flex-col gap-5">
-      <Skeleton className="h-2.5 w-36 mb-2" />
+      <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
+        Basic Information
+      </p>
+      {/* Recipe Name */}
       <div className="flex flex-col gap-1.5">
-        <Skeleton className="h-2.5 w-24" />
+        <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+          Recipe Name
+        </p>
         <Skeleton className="h-9 w-full rounded-md" />
       </div>
+      {/* Short Description */}
       <div className="flex flex-col gap-1.5">
-        <Skeleton className="h-2.5 w-32" />
+        <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+          Short Description{" "}
+          <span className="text-muted-foreground normal-case tracking-normal font-normal">
+            (optional)
+          </span>
+        </p>
         <Skeleton className="h-20 w-full rounded-md" />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-1.5">
-            <Skeleton className="h-2.5 w-16" />
+      {/* Category + Cuisine — 2 col */}
+      <div className="grid grid-cols-2 gap-4">
+        {["Category", "Cuisine"].map((label) => (
+          <div key={label} className="flex flex-col gap-1.5">
+            <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+              {label}
+            </p>
             <Skeleton className="h-9 w-full rounded-md" />
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-1.5">
-            <Skeleton className="h-2.5 w-20" />
+      {/* Difficulty + Prep Time + Servings — 3 col */}
+      <div className="grid grid-cols-3 gap-4">
+        {["Difficulty", "Prep Time (min)", "Servings"].map((label) => (
+          <div key={label} className="flex flex-col gap-1.5">
+            <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+              {label}
+            </p>
             <Skeleton className="h-9 w-full rounded-md" />
           </div>
         ))}
       </div>
     </section>
 
-    {/* Recipe Photo — shows existing image placeholder */}
+    {/* Recipe Photo */}
     <section className="flex flex-col gap-5">
-      <Skeleton className="h-2.5 w-28 mb-2" />
+      <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
+        Recipe Photo
+      </p>
       <div className="flex flex-col gap-1.5">
-        <Skeleton className="h-2.5 w-24" />
+        <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-foreground font-sans">
+          Cover Image
+        </p>
+        {/* Shows existing image while data loads */}
         <Skeleton className="h-40 w-full rounded-md" />
       </div>
     </section>
+  </div>
+);
 
+// ── Right column ──────────────────────────────────────────────────────────────
+const RightColumnSkeleton = () => (
+  <div className="flex flex-col gap-8">
     {/* Access & Pricing */}
     <section className="flex flex-col gap-5">
-      <Skeleton className="h-2.5 w-36 mb-2" />
+      <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
+        Access &amp; Pricing
+      </p>
       <Skeleton className="h-16 w-full rounded-md" />
     </section>
 
     {/* Ingredients */}
     <section className="flex flex-col gap-5">
-      <Skeleton className="h-2.5 w-24 mb-2" />
+      <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
+        Ingredients
+      </p>
+      {/* Column header labels */}
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-muted-foreground/60 font-sans">
+        <span className="w-20">Qty</span>
+        <span className="w-20">Unit</span>
+        <span className="flex-1">Name</span>
+      </div>
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3">
           <Skeleton className="h-9 w-20 rounded-md shrink-0" />
@@ -65,7 +109,9 @@ const EditRecipeFormSkeleton = () => (
 
     {/* Instructions */}
     <section className="flex flex-col gap-5">
-      <Skeleton className="h-2.5 w-24 mb-2" />
+      <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
+        Instructions
+      </p>
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="flex gap-3 items-start">
           <Skeleton className="h-6 w-6 rounded-full shrink-0 mt-1.5" />
@@ -73,29 +119,43 @@ const EditRecipeFormSkeleton = () => (
         </div>
       ))}
     </section>
-
-    {/* Footer: Cancel + Save Changes */}
-    <div className="flex items-center justify-between gap-4 pt-2 border-t border-border">
-      <Skeleton className="h-3 w-28 hidden sm:block" />
-      <div className="flex items-center gap-3 ml-auto">
-        <Skeleton className="h-8 w-16 rounded-md" />
-        <Skeleton className="h-10 w-32 rounded-md" />
-      </div>
-    </div>
   </div>
 );
 
+// ── Page ──────────────────────────────────────────────────────────────────────
 const EditRecipeLoading = () => (
   <div className="px-5 md:px-8 py-8">
-    {/* Header with Cancel link on the right */}
-    <div className="mb-8 flex items-start justify-between gap-4 animate-pulse">
+    {/* Static heading + Cancel; subtitle (recipe name) is API-fetched */}
+    <div className="mb-8 flex items-start justify-between gap-4">
       <div>
-        <Skeleton className="h-3.5 w-24" />
-        <Skeleton className="h-3 w-48 mt-2" />
+        <h2 className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]">
+          Edit Recipe
+        </h2>
+        <div className="h-3 w-48 bg-muted/60 rounded-sm animate-pulse mt-2" />
       </div>
-      <Skeleton className="h-3 w-14 shrink-0" />
+      <span className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans shrink-0">
+        Cancel
+      </span>
     </div>
-    <EditRecipeFormSkeleton />
+
+    <div className="flex flex-col gap-6 animate-pulse">
+      {/* Two-column grid — mirrors xl:grid-cols-2 in EditRecipeForm */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-10 gap-y-8 items-start">
+        <LeftColumnSkeleton />
+        <RightColumnSkeleton />
+      </div>
+
+      {/* Footer — mirrors EditRecipeForm footer */}
+      <div className="flex items-center justify-between gap-4 pt-4 border-t border-border">
+        <p className="text-[12px] font-sans text-muted-foreground hidden sm:block">
+          Unsaved changes
+        </p>
+        <div className="flex items-center gap-3 ml-auto">
+          <Skeleton className="h-8 w-16 rounded-md" />
+          <Skeleton className="h-10 w-32 rounded-md" />
+        </div>
+      </div>
+    </div>
   </div>
 );
 

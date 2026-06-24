@@ -1,18 +1,20 @@
 import StatCardsSkeleton from "@/components/dashboard/StatCardsSkeleton";
 
 /**
- * Dashboard overview — only the stat cards are API-fetched.
- * The page header ("Overview" title + subtitle) is static and renders instantly.
+ * Dashboard overview — only the stat cards and subtitle are API-fetched.
+ * The "Overview" heading is static and renders instantly.
  */
 const DashboardOverviewLoading = () => (
   <div className="px-5 md:px-8 py-8">
-    {/* Static page header — not skeletal */}
     <div className="mb-6">
-      <div className="h-3.5 w-20 bg-muted rounded-sm animate-pulse" />
+      <h2 className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]">
+        Overview
+      </h2>
+      {/* Subtitle contains user name / role — API-derived */}
       <div className="h-3 w-64 bg-muted/60 rounded-sm animate-pulse mt-2" />
     </div>
 
-    {/* Stat cards — API-fetched */}
+    {/* Stat cards — all values are API-fetched */}
     <StatCardsSkeleton count={4} dense={false} />
   </div>
 );

@@ -1,23 +1,32 @@
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import DashboardTableSkeleton from "@/components/dashboard/DashboardTableSkeleton";
 
 /**
- * My Recipes page — skeleton for the table only.
- * The page header (title, subtitle, "Add Recipe" button) is static.
+ * My Recipes — heading, subtitle, and "Add Recipe" button are all static.
+ * Only the table rows are API-fetched.
  * Columns: Recipe | Category | Cuisine | Prep Time | Status + Actions
  */
 const MyRecipesLoading = () => (
   <div className="px-5 md:px-8 py-8">
-    {/* Static header */}
     <div className="mb-6 flex items-center justify-between gap-4">
       <div>
-        <div className="h-3.5 w-24 bg-muted rounded-sm animate-pulse" />
-        <div className="h-3 w-48 bg-muted/60 rounded-sm animate-pulse mt-2" />
+        <h2 className="text-[15px] font-sans font-semibold text-foreground tracking-[-0.01em]">
+          My Recipes
+        </h2>
+        <p className="mt-1 text-[13px] font-sans text-muted-foreground">
+          Manage the recipes you&apos;ve published.
+        </p>
       </div>
-      {/* "Add Recipe" button placeholder */}
-      <div className="h-8 w-28 bg-muted rounded-md animate-pulse shrink-0" />
+      <Button variant="default" size="sm" asChild className="gap-1.5 shrink-0">
+        <Link href="/dashboard/add-recipe">
+          <Plus className="size-3.5" />
+          Add Recipe
+        </Link>
+      </Button>
     </div>
 
-    {/* Table — API-fetched */}
     <DashboardTableSkeleton colCount={5} rowCount={8} hasActions />
   </div>
 );
