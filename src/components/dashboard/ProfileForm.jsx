@@ -209,42 +209,6 @@ const ProfileForm = ({ user }) => {
           </Button>
         </div>
       </form>
-
-      {/* ── Password form (only for email/password accounts) ── */}
-      <form className="flex flex-col gap-6 mt-10">
-        <p className="text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans pb-2 border-b border-border">
-          Change Password
-        </p>
-
-        <FormField htmlFor="current-password" label="Current Password">
-          <Input
-            id="current-password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="current-password"
-          />
-        </FormField>
-
-        <FormField htmlFor="new-password" label="New Password">
-          <Input
-            id="new-password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </FormField>
-
-        <div className="flex justify-end pt-2 border-t border-border">
-          <Button
-            type="submit"
-            variant="secondary"
-            size="sm"
-            className="w-full sm:w-auto px-6 font-sans text-[13px] font-medium"
-          >
-            Update Password
-          </Button>
-        </div>
-      </form>
     </>
   );
 };

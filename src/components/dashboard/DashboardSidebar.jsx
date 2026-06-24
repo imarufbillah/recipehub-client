@@ -42,6 +42,7 @@ const ADMIN_NAV = [
   },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
   { href: "/dashboard/transactions", label: "Transactions", icon: CreditCard },
+  { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 
 const QUICK_LINKS = [
