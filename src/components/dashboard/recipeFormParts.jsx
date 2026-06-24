@@ -1,11 +1,5 @@
 "use client";
 
-/**
- * recipeFormParts — shared sub-components used by both RecipeForm (add)
- * and EditRecipeForm (edit).  Kept in a single file because they are
- * tightly coupled and have no standalone usage outside the recipe forms.
- */
-
 import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Plus, Trash2, Upload, X } from "lucide-react";
@@ -128,6 +122,11 @@ export const EditImageDropZone = ({
   const inputRef = useRef(null);
   const [replacing, setReplacing] = useState(false);
   const [dragging, setDragging] = useState(false);
+  // Track whether the existing image has finished loading from its remote URL.
+  // Starts false so the skeleton is visible immediately on mount; flips to true
+  // in the Image onLoad callback. Resets to false if existingUrl changes (e.g.
+  // navigating between edit pages without unmounting).
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleDrop = useCallback(
     (e) => {
@@ -239,12 +238,23 @@ export const EditImageDropZone = ({
   // Default state — show existing image with a replace button overlay
   return (
     <div className="relative w-full aspect-3/2 rounded-md overflow-hidden border border-border group">
+      {/* Skeleton — visible until the remote image has loaded */}
+      {!imgLoaded && (
+        <div
+          className="absolute inset-0 bg-muted/60 animate-pulse"
+          aria-hidden
+        />
+      )}
       <Image
         src={existingUrl}
         alt="Current recipe image"
         fill
-        className="object-cover object-center"
+        className={cn(
+          "object-cover object-center transition-opacity duration-300",
+          imgLoaded ? "opacity-100" : "opacity-0",
+        )}
         sizes="(max-width: 768px) 100vw, 600px"
+        onLoad={() => setImgLoaded(true)}
       />
       {/* Replace overlay — appears on hover, always visible on touch */}
       <button
