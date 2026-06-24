@@ -9,6 +9,7 @@ import {
   Receipt,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -402,6 +403,9 @@ const TransactionsClient = ({
     startTransition(() => router.push("/dashboard/transactions"));
   };
 
+  const hasActiveFilters =
+    typeFilter !== "all" || statusFilter || fromDate || toDate || searchQ;
+
   const handleCopyId = (e, id) => {
     e.stopPropagation();
     navigator.clipboard
@@ -508,6 +512,26 @@ const TransactionsClient = ({
             />
           </div>
         </div>
+
+        {/* Clear filters — only when any filter is active */}
+        {hasActiveFilters && (
+          <div className="flex flex-col justify-end">
+            <button
+              type="button"
+              onClick={clearFilters}
+              aria-label="Clear all filters"
+              className={cn(
+                "inline-flex items-center gap-1 h-8 px-2 rounded-md",
+                "text-[11px] uppercase tracking-[0.08em] font-medium font-sans",
+                "text-muted-foreground hover:text-foreground transition-colors duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              )}
+            >
+              <X className="size-3 shrink-0" aria-hidden />
+              <span className="hidden sm:inline">Clear</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Table ── */}
