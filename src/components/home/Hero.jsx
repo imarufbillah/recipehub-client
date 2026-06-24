@@ -2,9 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import HeroStats from "./HeroStats";
+
+const HERO_IMAGES = {
+  light: {
+    src: "/recipehub-light-mode-banner.jpeg",
+    alt: "Cooked food with sliced vegetables in white bowl",
+  },
+  dark: {
+    src: "/recipehub-dark-mode-banner.jpeg",
+    alt: "A plate of food on a wooden table",
+  },
+};
 
 /**
  * Stagger fade-up — subtle 14px translate + opacity, smooth deceleration.
@@ -28,20 +41,21 @@ const fadeIn = {
 };
 
 const Hero = () => {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  const image =
+    mounted && resolvedTheme === "dark" ? HERO_IMAGES.dark : HERO_IMAGES.light;
+
   return (
-    /*
-     * -mt-16 pulls the hero flush behind the fixed navbar (h-16 = 64px).
-     * The public layout adds pt-16 to <main>, so we cancel it intentionally —
-     * the hero bleeds under the transparent navbar on desktop.
-     * Mobile stacks vertically: image on top, text panel below.
-     */
     <section className="relative -mt-16 w-full min-h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-
-      {/* ══════════════════════════════════════════════════════════
-          LEFT COLUMN — editorial text panel (desktop: 52%, mobile: full)
-          ══════════════════════════════════════════════════════════ */}
+      {/* Left column */}
       <div className="relative z-10 flex flex-col justify-center order-2 lg:order-1 w-full lg:w-[52%] px-6 sm:px-10 md:px-14 lg:pl-16 xl:pl-24 lg:pr-12 py-16 lg:py-0 lg:min-h-screen">
-
         {/* Top editorial rule + eyebrow — desktop only */}
         <motion.div
           variants={fadeUp}
@@ -92,7 +106,7 @@ const Hero = () => {
           initial="hidden"
           animate="visible"
           custom={0.35}
-          className="mt-8 mb-8 w-full max-w-[360px] h-px bg-border"
+          className="mt-8 mb-8 w-full max-w-90 h-px bg-border"
         />
 
         {/* ── Supporting copy ── */}
@@ -140,9 +154,7 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════
-          RIGHT COLUMN — editorial image panel (desktop: 48%, mobile: full-width above text)
-          ══════════════════════════════════════════════════════════ */}
+      {/* Right column */}
       <motion.div
         className="relative order-1 lg:order-2 w-full lg:w-[48%] h-[60vw] sm:h-[55vw] lg:h-auto lg:min-h-screen"
         variants={fadeIn}
@@ -150,14 +162,14 @@ const Hero = () => {
         animate="visible"
         custom={0.1}
       >
-        {/* Primary hero image — sharp corners, editorial feel */}
+        {/* Primary hero image — theme-aware: warm/bright in light mode, moody/dark in dark mode */}
         <Image
-          src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=85"
-          alt="Chef plating an elegant dish — editorial food photography"
+          src={image.src}
+          alt={image.alt}
           fill
           priority
-          sizes="(max-width: 1024px) 100vw, 48vw"
-          className="object-cover object-center"
+          sizes="(max-width: 1920px) 100vw, 100vw"
+          className="object-cover object-center transition-opacity duration-500"
         />
 
         {/* Left-edge gradient — blends image into the text column on desktop */}
@@ -177,60 +189,7 @@ const Hero = () => {
               "linear-gradient(to bottom, transparent, var(--background))",
           }}
         />
-
-        {/* ── Caption card — overlapping bottom-left on desktop ──
-            Surfaces recipe metadata at the image boundary — editorial pull-out moment.
-        */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.9}
-          className="absolute bottom-10 left-0 lg:-left-6 z-20 hidden lg:block"
-        >
-          <div className="bg-card border border-border rounded-lg px-5 py-4 shadow-none">
-            {/* Serif dish name */}
-            <p className="font-heading text-[16px] leading-snug tracking-[-0.01em] text-card-foreground">
-              Seared Salmon, Dashi Broth
-            </p>
-            {/* Meta line */}
-            <p className="mt-1.5 text-[11px] uppercase tracking-[0.08em] font-medium text-muted-foreground font-sans">
-              25 min · Serves 2 · Premium
-            </p>
-            {/* Accent dot — the accent color's one appearance, a "Featured" signal */}
-            <div className="mt-2.5 inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-              <span className="text-[11px] uppercase tracking-[0.08em] font-medium text-accent font-sans">
-                Chef's Pick
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── Issue number — top-right editorial stamp ──
-            Thin mono text, low-opacity, purely typographic texture.
-        */}
-        <motion.div
-          variants={fadeIn}
-          initial="hidden"
-          animate="visible"
-          custom={1.1}
-          className="absolute top-8 right-6 hidden lg:flex flex-col items-end gap-1 pointer-events-none"
-        >
-          <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-primary-foreground/60 mix-blend-overlay">
-            Vol. 01
-          </span>
-          <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-primary-foreground/60 mix-blend-overlay">
-            2026
-          </span>
-        </motion.div>
       </motion.div>
-
-      {/* ══════════════════════════════════════════════════════════
-          DECORATIVE VERTICAL RULE — desktop only, separates the two columns
-          at the boundary. A single hairline, pure editorial texture.
-          ══════════════════════════════════════════════════════════ */}
-      <div className="absolute top-1/4 bottom-1/4 left-[52%] w-px bg-border hidden lg:block pointer-events-none z-20" />
     </section>
   );
 };
