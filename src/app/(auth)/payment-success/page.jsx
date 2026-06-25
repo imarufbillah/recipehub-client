@@ -62,7 +62,7 @@ const PaymentSuccessPage = async ({ searchParams }) => {
         plan: "premium",
         status: sub?.status ?? "active",
         interval: "month",
-        amount: session.amount_total ?? 0,
+        amount: session.amount_total / 100 ?? 0,
         currency: session.currency ?? "usd",
         currentPeriodStart: sub?.current_period_start
           ? new Date(sub.current_period_start * 1000).toISOString()
